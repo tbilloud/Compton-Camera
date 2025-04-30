@@ -10,7 +10,7 @@ from tools.allpix import *
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, ms, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.ms, g4_units.s
-    sim.volume_manager.add_material_database('../data/GateMaterials.db')
+    sim.volume_manager.add_material_database('tools/GateMaterials.db')
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
     # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
