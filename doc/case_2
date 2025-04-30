@@ -1,0 +1,49 @@
+*********************************************************************************************************
+* G4Track Information:   Particle = gamma,   Track ID = 1,   Parent ID = 0
+*********************************************************************************************************
+
+Step#    X(mm)    Y(mm)    Z(mm) KinE(MeV)  dE(MeV) StepLeng TrackLeng  NextVolume ProcName
+    0        0        0     -500         1        0        0         0       world initStep
+    1        0        0        0         1        0      500       500      sensor Transportation
+    2        0        0     12.9     0.215        0     12.9       513      sensor compt
+    3     1.53    0.693     10.1         0    0.215     3.32       516      sensor phot
+
+*********************************************************************************************************
+* G4Track Information:   Particle = e-,   Track ID = 2,   Parent ID = 1
+*********************************************************************************************************
+
+Step#    X(mm)    Y(mm)    Z(mm) KinE(MeV)  dE(MeV) StepLeng TrackLeng  NextVolume ProcName
+    0        0        0     12.9     0.785        0        0         0      sensor initStep
+    1 -0.00951 -0.00431       13     0.471     0.23    0.356     0.356      sensor eBrem
+    2   0.0435  -0.0179     13.1         0    0.471    0.479     0.836      sensor eIoni
+
+*********************************************************************************************************
+* G4Track Information:   Particle = gamma,   Track ID = 3,   Parent ID = 2
+*********************************************************************************************************
+
+Step#    X(mm)    Y(mm)    Z(mm) KinE(MeV)  dE(MeV) StepLeng TrackLeng  NextVolume ProcName
+    0 -0.00951 -0.00431       13    0.0836        0        0         0      sensor initStep
+    1    0.325   -0.164     13.1         0   0.0836    0.374     0.374      sensor phot
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#  EventID  TrackID  ParentID  ParentParticleName  ParticleName  KineticEnergy  TotalEnergyDeposit  TrackCreatorProcess  ProcessDefinedStep   StepLength
+       3        1         0             unknown         gamma    0.215230284         0.215230284                 none               compt  3.323820743
+       3        2         1               gamma            e-    0.784769716         0.229902759                compt                none  0.356257915
+       3        2         1               gamma            e-    0.471311071         0.471311071                compt               eBrem  0.479270151
+       3        3         2                  e-         gamma    0.083555886         0.083555886                eBrem                none  0.373664584
+
+
+
+Primary gamma interacts via Compton
+
+The recoil e- is tracked:
+=> dE(MeV) = 0 for the 'compt' step, it's not stored in hit file
+=> new track for e- is created
+
+A fluorescence occur at the Compton interaction atom:
+=> A new track for fluorescence is created
+
+Initial gamma stops by photo-electric effect
+
+NOTE: No indication of photo-electric effects in hit file !
