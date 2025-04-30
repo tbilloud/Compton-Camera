@@ -19,11 +19,11 @@ Requires:
 - Optional: Allpix2, ROOT 6, CUDA
 
 Tested with:
-- Ubuntu 22.04 and 24.04
-- python 3.10, 3.11, 3.12
-- Gate 10.0.1  
-- Allpix2 3.1.0
-- cupy-cuda115 / cupy-cuda128 and GeForce RTX 2080 Ti
+- OS: Ubuntu 22.04 / 24.04
+- Python: 3.10, 3.11, 3.12 (issue with OpenSSL with 3.9 and opengate-core with 3.13)
+- Gate: 10.0.1  
+- Allpix2: 3.1.0
+- GPU: cupy-cuda115/128 + GeForce RTX 2080 Ti
 
 Future work:
 - add advanced GPU-based reconstruction algorithms, e.g. CoReSi
@@ -32,12 +32,12 @@ Future work:
 
 ### 1) Download or clone/checkout: 
 ```
-git clone -b compton-camera-tests https://github.com/tbilloud/GateContrib
+git clone https://github.com/tbilloud/ComptonCamera
 ```
 
 ### 2) Create a virtual environment
 ```
-cd GateContrib/imaging/ComptonCamera_tests/Gate10
+cd ComptonCamera
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -45,10 +45,13 @@ source venv/bin/activate
 ### 3) Install required python packages
 `pip install -r requirements.txt`  
 
-To use the GPU-based functions (point source validation, reconstruction), install CUDA and the Cupy package suited to your CUDA version, e.g.  
+### 4) Optional: Install GPU tools
+To use the GPU-based functions (point source validation, reconstruction):
+a) Install CUDA 
+b) Install the Cupy package suited to your CUDA version, e.g.  
 `pip install cupy-cuda115`
 
-### 4) Optional: Install Allpix2
+### 5) Optional: Install Allpix2
 
 Install BOOST:
 ```
