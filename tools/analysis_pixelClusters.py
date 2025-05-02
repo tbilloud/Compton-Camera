@@ -2,7 +2,7 @@
 
 from tools.analysis_pixelHits import *
 from opengate.logger import global_log
-from analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID
+from .analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID
 import pandas as pd
 
 pd.set_option('display.max_columns', 100)

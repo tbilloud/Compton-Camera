@@ -6,7 +6,7 @@ import os
 import sys
 import pandas
 import uproot
-from analysis_pixelHits import PIX_X_ID, PIX_Y_ID, EVENTID, ENERGY_keV, TOA
+from .analysis_pixelHits import PIX_X_ID, PIX_Y_ID, EVENTID, ENERGY_keV, TOA
 from tools.utils import *
 from opengate.logger import global_log
 
