@@ -1,9 +1,9 @@
-# Simulate a single layer Compton camera
+# Timepix3 Compton camera simulation and data processing
 
 ![Screenshot of a reconstruction](doc/img.png)
 
-- Use Gate10 to simulate a single layer Compton camera
-- Optionally add Allpix2 to simulate detector a semiconductor pixel detector response (e.g. Timepix3)
+A single python script to:
+- Simulate particle transport via Geant4 and detector response via Allpix2
 - Reconstruct cones from:
   - Geant4/Gate 'hits'
   - Gate 'singles'
@@ -14,19 +14,18 @@
 - Visualize 3D images with napari
 
 Requires:
-- python3
+- Linux or MacOS
 - 20 GB of disk space
-- Optional: Allpix2, ROOT 6, CUDA
+- Python3 with packages OpenGate, Napari, uproot, awkward-pandas.
+- Allpix²
+- Optional: CUDA
 
 Tested with:
-- OS: Ubuntu 22.04 / 24.04
+- OS: Ubuntu 22.04 / 24.04, MacOS 15.4.1 (Allpix² does not support Windows)
 - Python: 3.10, 3.11, 3.12 (issue with OpenSSL with 3.9 and opengate-core with 3.13)
-- Gate: 10.0.1  
-- Allpix2: 3.1.0
+- OpenGate: 10.0.1, 10.0.2
+- Allpix²: 3.1.0
 - GPU: cupy-cuda115/128 + GeForce RTX 2080 Ti
-
-Future work:
-- add advanced GPU-based reconstruction algorithms, e.g. CoReSi
 
 ## Installation
 
@@ -45,33 +44,35 @@ source venv/bin/activate
 ### 3) Install required python packages
 `pip install -r requirements.txt`  
 
-### 4) Optional: Install GPU tools
-To use the GPU-based functions (point source validation, reconstruction):
-a) Install CUDA 
-b) Install the Cupy package suited to your CUDA version, e.g.  
-`pip install cupy-cuda115`
-
-### 5) Optional: Install Allpix2
-
-Install BOOST:
-```
-sudo apt-get install libboost-all-dev
-```
-
-Install Eigen3:
-```
-sudo apt-get install libeigen3-dev
-```
-
-Install and source ROOT 6:  
-https://root.cern/install/  
+### 4) Install Allpix2
+ 
+#### Prerequisites Ubuntu 
+Tested with Ubuntu 22.04 and 24.04
+Install BOOST `sudo apt-get install libboost-all-dev`  
+Install Eigen3 `sudo apt-get install libeigen3-dev`
+Install ROOT6 binary (https://root.cern/install/):  
 ```
 wget https://root.cern/download/root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
 tar -xzvf root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
 source root/bin/thisroot.sh
 ```
 
-Then install Allpix2 without Geant4:  
+#### Prerequisites MacOS 
+Tested with Sequoia 15.4.1
+- Install Apple's Command Line Developer Tools `xcode-select --install`
+- Install CMake (https://cmake.org/download) and then:
+`sudo /Applications/CMake.app/Contents/bin/cmake-gui --install`
+- Install ROOT6 (https://root.cern/install). Current version (6.32.12, April 2025):
+  - Fails with
+    - binary: MacOS 15.4.1 prevents running because of security issues 
+    - macports: dependency graphviz fails to install 
+    - source: cmake configuration fails, libatomic not found
+  - Succeeds with
+    - homebrew: installs ROOT 6.34.08 built with C++17 (as of )
+- Install BOOST `brew install boost`
+- Install Eigen3 `brew install eigen`
+
+#### Then install Allpix2 without Geant4:  
 https://allpix-squared.docs.cern.ch/docs/02_installation/  
 ```
 cd allpix
@@ -85,15 +86,20 @@ make -j4
 make install
 ```
 
-
 ### 5) Set environment
 ```
 export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
 ```
 
+### 6) Optional: Install GPU tools
+To use the GPU-based functions (point source validation, reconstruction):
+a) Install CUDA (https://developer.nvidia.com/cuda-downloads)
+b) Install the Cupy package suited to your CUDA version, e.g.  
+`pip install cupy-cuda115`
+
 ## Getting started
 Run the test:  
-`python3 main.py`  
+`python3 main_basic.py`  or, if using Allpix2, `python3 main_allpix.py`
 The 1st time you run a simulation, Gate10 will install Geant4 datasets, which can take a while. This is done only once.
 
 In main.py, the 1st part (code until block 'ANALYSIS AND RECONSTRUCTION') is the Gate 10 simulation. See user manual:  
@@ -106,15 +112,15 @@ Then, several functions are available. Step-by-step:
 2) Simulate pixel hits:
 - from Gate singles with gSingles2pixelHits()
 - from Allpix2 output with gHits2allpix2pixelHits()
-3) Reconsutruct cones:
+3) Reconstruct cones:
 - from Gate4 hits with gHits2cones_byEvtID()
 - from pixel hits (WIP)
 4) Check cones from a point sources:
 - validate_psource() plots cone projections. It's slow, ~1 sec per cone.
 - with GPU acceleration with validate_psource_gpu()
-5) Reconstruct 3D image:
-- with backprojection with backprojection(). It's slow, ~1 sec per cone.
-- with GPU acceleration with backprojection_gpu()
+5) Reconstruct 3D image with:
+- simple backprojection with backprojection(). It's slow, ~1 sec per cone.
+- PU-accelerated backpropagation with backprojection_gpu()
 
 ### QT issues with Gate 10.0.1
 When using Qt-based code (e.g. napari) after simulation, the main.py script might fail with:
