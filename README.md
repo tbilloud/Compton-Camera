@@ -122,19 +122,28 @@ Then, several functions are available. Step-by-step:
 - simple backprojection with backprojection(). It's slow, ~1 sec per cone.
 - PU-accelerated backpropagation with backprojection_gpu()
 
-### QT issues with Gate 10.0.1
-When using Qt-based code (e.g. napari) after simulation, the main.py script might fail with:
+### QT/opengate conflict:
+Napari and OpenGate use the same QT backends (PyQt5), which causes conflicts.
+Using Qt-based code (e.g. napari) and gate in the same script leads to warning/crashes.  
+#### Ubuntu
 ```
 WARNING: QObject::moveToThread: Current thread (0x57ad941535d0) is not the object's thread (0x57ad94c1ef50).
 Cannot move to target thread (0x57ad941535d0)
-...
 ```
-
 Solution:
 ```
-mv /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins.bak`
+mv /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins.bak
 ```
-Replace XX with your python version, e.g. 10
+-> replace XX with your python version, e.g. 10
+
+#### Macos
+```
+objc[16117]: Class QT_... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d1278) ... One of the duplicates must be removed or renamed.
+objc[16117]: Class KeyV... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d12a0) ... One of the duplicates must be removed or renamed.
+objc[16117]: Class RunL... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d12f0) ... One of the duplicates must be removed or renamed.
+```
+Solution: TODO !
+
 
 ## Allpix2
 
