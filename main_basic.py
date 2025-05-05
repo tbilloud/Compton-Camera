@@ -90,7 +90,7 @@ if __name__ == "__main__":
     # POINT SOURCE VALIDATION
     sp = source.position.translation
     validate_psource(cones, source_pos=sp, vpitch=0.1, vsize=(256, 256, 256),
-                     plot_seq=True, plot_stack=True, plot_napari=True)
+                     plot_seq=False, plot_stack=True, plot_napari=True)
 
     # RECONSTRUCTION
     d = {'size': sensor.size, 'position': sensor.translation}
