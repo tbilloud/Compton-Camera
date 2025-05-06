@@ -16,9 +16,9 @@ A single python script to:
 Requires:
 - Linux or MacOS
 - 20 GB of disk space
-- Python3 with packages OpenGate, Napari, uproot, awkward-pandas.
+- Python >= 3.10 and pip
 - Allpix²
-- Optional: CUDA
+- Optional: CUDA, napari
 
 Tested with:
 - OS: Ubuntu 22.04 / 24.04, MacOS 15.4.1 (Allpix² does not support Windows)
@@ -27,9 +27,15 @@ Tested with:
 - Allpix²: 3.1.0
 - GPU: cupy-cuda115/128 + GeForce RTX 2080 Ti
 
+Python:
+3.9, 3.10.17 installs opengate==10.0.0
+3.11.12 installs opengate==10.0.2
+
 ## Installation
 
-### 1) Download or clone/checkout: 
+If not already installed, install python (e.g. with pyenv on MacOS) and pip
+
+### 1) Download or clone: 
 ```
 git clone https://github.com/tbilloud/ComptonCamera
 ```
