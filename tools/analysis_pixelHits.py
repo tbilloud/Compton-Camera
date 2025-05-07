@@ -23,8 +23,8 @@ pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps x:.3
 PIXEL_ID = 'PixelID (int16)'
 TOA = 'ToA (ns)'
 ENERGY_keV = 'Energy (keV)'
-PIX_X_ID = 'X' # pixel X index (starts from 0, bottom left)
-PIX_Y_ID = 'Y' # pixel Y index (starts from 0, bottom left)
+PIX_X_ID = 'X'  # pixel X index (starts from 0, bottom left)
+PIX_Y_ID = 'Y'  # pixel Y index (starts from 0, bottom left)
 TOT = 'ToT'
 pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, TOT, ENERGY_keV, PIXEL_ID]
 EVENTID = 'EventID'
@@ -37,20 +37,23 @@ def singles2pixelHits(file_path):
     else:
         global_log.info(f"Offline [pixelHits]: START")
         global_log.debug(f"Input {file_path}")
-
+    stime = time.time()
     singles = uproot.open(file_path)['Singles'].arrays(library='pd')
+    global_log.debug(f"Number of singles: {len(singles)}")
     singles['HitUniqueVolumeID'] = singles['HitUniqueVolumeID'].astype(
         str).str.replace(r'0_', '', regex=True)
     singles.rename(columns={'HitUniqueVolumeID': PIXEL_ID}, inplace=True)
+    singles[PIXEL_ID] = singles[PIXEL_ID].str.replace('pixel_param-', '', regex=False)
     singles[PIXEL_ID] = singles[PIXEL_ID].astype(int)
     singles.rename(columns={'TotalEnergyDeposit': ENERGY_keV}, inplace=True)
     singles[ENERGY_keV] = singles[ENERGY_keV] * 1e3  # Convert MeV to keV
     singles.rename(columns={'GlobalTime': TOA}, inplace=True)
-    singles.rename(columns={'Position_X': PIX_X_mm}, inplace=True)
-    singles.rename(columns={'Position_Y': PIX_Y_mm}, inplace=True)
-    singles.rename(columns={'Position_Z': PIX_Z_mm}, inplace=True)
+    x, y = zip(*singles[PIXEL_ID].apply(get_pixID_2D, args=(256,)))
+    singles[PIX_X_ID] = x
+    singles[PIX_Y_ID] = y
     singles[TOT] = singles[ENERGY_keV] * 1e3  # TODO temporary
     global_log.debug(f"Number of pixel hits: {len(singles)}")
+    global_log.info(f"Offline [pixelHits]: {get_stop_string(stime)}")
     return singles[simulation_columns + pixelHits_columns]
 
 

@@ -1,7 +1,7 @@
 import opengate_core
 from opengate.managers import Simulation
 from opengate.geometry.volumes import *
-from tools.analysis_basics import *
+from tools.analysis_pixelClusters import pixelHits2pixelClusters
 from tools.point_source_validation import *
 from tools.reco_backprojection import *
 from tools.allpix import *
@@ -12,6 +12,7 @@ if __name__ == "__main__":
     sim.volume_manager.add_material_database('tools/GateMaterials.db')
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
+    sim.verbose_level = 'DEBUG'
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -73,27 +74,37 @@ if __name__ == "__main__":
     ##   ANALYSIS AND RECONSTRUCTION
     ##=====================================================
 
-    # BASICS
+    # INPUTS
     hits_path = Path(sim.output_dir) / hits.output_filename
     singles_path = Path(sim.output_dir) / singles.output_filename
-    analyse_hits(hits_path)
-    analyse_singles(singles_path)
 
-    # PIXEL HITS (optional)
-    # pixelHits = singles2pixelHits(singles_path)
-    # pixelHits = gHits2allpix2pixelHits(sim, npix)
+    # PIXEL HITS
+    pixelHits = singles2pixelHits(singles_path)
     # plot_pixelHits_perEventID(pixelHits,n_pixels=npix,log_scale=[False, False, True])
 
+    # PIXEL CLUSTERS
+    pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='m2')
+
     # CONES
-    cones = gHits2cones_byEvtID(hits_path, source.energy.mono)
+    # =======> GROUND TRUTH <=======
+    cn1 = gHits2cones_byEvtID(hits_path, source.energy.mono)
+    # # =========> TIMEPIX <==========
+    sp = charge_speed_mm_ns(mobility_cm2_Vs=1000, bias_V=1000, thick_mm=sensor.size[2])
+    cn2 = pixelClusters2cones_byEvtID(pixelClusters,
+                                            source_MeV=source.energy.mono,
+                                            thickness_mm=thickness,
+                                            charge_speed_mm_ns=sp,
+                                            to_global=[npix,sensor]  # for global coord
+                                            )
 
     # POINT SOURCE VALIDATION
     sp = source.position.translation
     vs = (256, 256, 256)
-    sk = valid_psource(cones, src_pos=sp, vpitch=0.1, vsize=vs, plot_seq=0, plot_stk=1)
+    stk1 = valid_psource(cn1, src_pos=sp, vpitch=0.1, vsize=vs, plot_seq=0, plot_stk=1)
+    stk2 = valid_psource(cn2, src_pos=sp, vpitch=0.1, vsize=vs, plot_seq=0, plot_stk=1)
     # plot_stack_napari(sk, vsize = vs) # TODO check with np and cp
 
     # RECONSTRUCTION
     d = {'size': sensor.size, 'position': sensor.translation}
-    vol = reco_bp(cones, vpitch=0.1, vsize=vs, det=d)
+    vol = reco_bp(cn1, vpitch=0.1, vsize=vs, det=d)
     # TODO: add 3d plot with matplotlib and optionally napari
