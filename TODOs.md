@@ -16,3 +16,5 @@ sim.volume_manager.add_volume(par)
 # hits.keep_zero_edep = True # TODO compatible with gHits2cones_byEventID ?
 
 # TODO: include advanced GPU-based reconstruction algorithms, e.g. CoReSi?
+
+# TODO: adapt offline analysis block in main_xxx files to multiple sim runs

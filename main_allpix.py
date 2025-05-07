@@ -81,13 +81,13 @@ if __name__ == "__main__":
     ## ============================
     ## ==  OFFLINE ANALYSIS      ==
     ## ============================
-    # TODO adapt to multiple sim runs
 
     hits_path = Path(sim.output_dir) / hits.output_filename
     hits_df = uproot.open(hits_path)['Hits'].arrays(library='pd')
 
     # ################# PIXEL HITS ########################
-    pixelHits = gHits2allpix2pixelHits(sim, npix, config='fast')
+    pixelHits = gHits2allpix2pixelHits(sim, npix, config='fast', log_level='FATAL')
+    # TODO: check warning about (mobility?) model not adapted to CdTe
 
     # ################# PIXEL CLUSTERS ####################
     pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='m2')
