@@ -128,6 +128,11 @@ Then, several functions are available. Step-by-step:
 - simple backprojection with backprojection(). It's slow, ~1 sec per cone.
 - PU-accelerated backpropagation with backprojection_gpu()
 
+For Linux users, potting functions using napari are available:
+- scroll between cones with plot_stack_napari()
+- show reconstructed source and detector geometry in 3D with plot_reconstruction_napari()
+Does not work on MacOS yet, see QT/opengate conflict below.
+
 ### QT/opengate conflict:
 Napari and OpenGate use the same QT backends (PyQt5), which causes conflicts.
 Using Qt-based code (e.g. napari) and gate in the same script leads to warning/crashes.  
