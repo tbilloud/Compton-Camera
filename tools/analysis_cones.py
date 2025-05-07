@@ -26,10 +26,10 @@ def gHits2cones_byEvtID(file_path, source_MeV):
         sys.exit(f"File {file_path} does not exist, probably no hit produced.")
     else:
         global_log.info(f"Offline [cones ghits]: START")
-        global_log.debug(f"Input {file_path}")
 
     stime = time.time()
     hits = uproot.open(file_path)['Hits'].arrays(library='pd')
+    global_log.debug(f"Input {file_path} ({len(hits)} entries)")
     grouped = hits.groupby('EventID')
     cones = []
 
