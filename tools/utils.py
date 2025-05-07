@@ -167,6 +167,9 @@ def get_stop_string(stime):
 
 
 def global_log_debug_df(df):
+    """
+    Print preview (head) of the dataframe
+    """
     if not df.empty:
         global_log.debug(f"Output preview:\n{df.head().to_string(index=False)}")
 
