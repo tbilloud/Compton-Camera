@@ -102,7 +102,10 @@ if __name__ == "__main__":
                                             to_global=[npix,sensor]  # for global coord
                                             )
 
-    # # ################## VALIDATION / RECONSTRUCTION ####################
+    # ########## VALIDATION WITH POINT SOURCE #############
     sp, vp, vs = source.position.translation, 0.1, (256, 256, 256)
     sth = valid_psource(ctruth, src_pos=sp, vpitch=vp, vsize=vs, plot_seq=0, plot_stk=1)
     stpx = valid_psource(ctpx, src_pos=sp, vpitch=vp, vsize=vs, plot_seq=0, plot_stk=1)
+
+    # ################## RECONSTRUCTION ####################
+    # TODO

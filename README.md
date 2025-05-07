@@ -11,7 +11,7 @@ A single python script to:
   - measured data (WIP)
 - Validate simulation/measurement of gamma point sources
 - Reconstruct 3D image with basic back-projection
-- Visualize 3D images with napari
+- Visualize 3D images with napari (Linux only)
 
 Requires:
 - Linux or MacOS
@@ -48,7 +48,7 @@ source venv/bin/activate
 ```
 
 ### 3) Install required python packages
-`pip install -r requirements.txt`  
+`pip install -r requirements-OS.txt` (OS is `linux` or `macos` according to your system)
 
 ### 4) Install Allpix2
  

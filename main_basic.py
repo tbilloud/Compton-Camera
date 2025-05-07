@@ -78,14 +78,14 @@ if __name__ == "__main__":
     hits_path = Path(sim.output_dir) / hits.output_filename
     singles_path = Path(sim.output_dir) / singles.output_filename
 
-    # PIXEL HITS
+    # ################# PIXEL HITS ########################
     pixelHits = singles2pixelHits(singles_path)
     # plot_pixelHits_perEventID(pixelHits,n_pixels=npix,log_scale=[False, False, True])
 
-    # PIXEL CLUSTERS
+    # ################# PIXEL CLUSTERS ####################
     pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='m2')
 
-    # CONES
+    # #################### CONES ##########################
     # =======> GROUND TRUTH <=======
     cn1 = gHits2cones_byEvtID(hits_path, source.energy.mono)
     # # =========> TIMEPIX <==========
@@ -97,14 +97,14 @@ if __name__ == "__main__":
                                             to_global=[npix,sensor]  # for global coord
                                             )
 
-    # POINT SOURCE VALIDATION
+    # ########## VALIDATION WITH POINT SOURCE #############
     sp = source.position.translation
     vs = (256, 256, 256)
     stk1 = valid_psource(cn1, src_pos=sp, vpitch=0.1, vsize=vs, plot_seq=0, plot_stk=1)
     stk2 = valid_psource(cn2, src_pos=sp, vpitch=0.1, vsize=vs, plot_seq=0, plot_stk=1)
     # plot_stack_napari(sk, vsize = vs) # TODO check with np and cp
 
-    # RECONSTRUCTION
+    # ################## RECONSTRUCTION ####################
     d = {'size': sensor.size, 'position': sensor.translation}
     vol = reco_bp(cn1, vpitch=0.1, vsize=vs, det=d)
     # TODO: add 3d plot with matplotlib and optionally napari
