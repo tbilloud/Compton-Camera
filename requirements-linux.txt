@@ -1,4 +1,4 @@
-opengate
+opengate==10.0.1 # see TODOs.md for 10.0.2
 awkward-pandas
 napari[all]==0.5.5 # 0.5.6 not compatibile with latest napari-bbox 0.0.9
 napari-bbox==0.0.9
