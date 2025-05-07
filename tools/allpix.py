@@ -28,7 +28,8 @@ def run_allpix(sim,
     try:
         pixel = sim.volume_manager.get_volume("pixel_param")
     except Exception:
-        sys.exit(f"Pixels must be defined with RepeatParametrisedVolume() in Gate")
+        global_log.error(f"Pixels must be defined with RepeatParametrisedVolume() in Gate. Call the volume 'pixel'.")
+        sys.exit()
 
     sensor = sim.volume_manager.get_volume("sensor")
     source = sim.source_manager.get_source("source")
