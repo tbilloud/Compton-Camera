@@ -27,7 +27,7 @@ def plot_stack_napari(z_slice_stack, vsize):
     napari.run()
 
 
-def display_reconstruction(vol, vsize, vpitch, detector=False):
+def plot_reconstruction_napari(vol, vsize, vpitch, detector=False):
 
     # plt.imshow(vol[128,:,:])
     # plt.show()
