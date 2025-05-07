@@ -233,6 +233,8 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
                 })
 
     df = pd.DataFrame(rows, columns=simulation_columns + pixelHits_columns)
+    if len(df) == 0:
+        global_log.error(f"Empty pixel hits dataframe, probably no hit produced.")
     global_log_debug_df(df)
     global_log.info(f"Offline [pixelHits]: {get_stop_string(stime)}")
     return df

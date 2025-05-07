@@ -82,7 +82,10 @@ def new_clust(clust_list, cluster, hit, n_pixels, process_func, **kwargs):
 # TODO speed -> https://pandas.pydata.org/docs/user_guide/basics.html#iteration
 def pixelHits2pixelClusters(pixelHits, npix, window_ns, f, **kwargs):
     global_log.info(f"Offline [pixelClusters]: START")
-    global_log.debug(f"Input pixel hits dataframe ({len(pixelHits)} entries)")
+    if not len(pixelHits):
+        global_log.error(f"Empty pixel hits dataframe, probably no hit produced.")
+    else:
+        global_log.debug(f"Input pixel hits dataframe ({len(pixelHits)} entries)")
     stime = time.time()
 
     pixelHits = pixelHits.sort_values(by=TOA)
