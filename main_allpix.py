@@ -92,19 +92,17 @@ if __name__ == "__main__":
 
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======
-    cones_truth = gHits2cones_byEvtID(hits_path, source.energy.mono)
+    ctruth = gHits2cones_byEvtID(hits_path, source.energy.mono)
     # # =========> TIMEPIX <==========
     sp = charge_speed_mm_ns(mobility_cm2_Vs=1000, bias_V=1000, thick_mm=sensor.size[2])
-    cones_tpx = pixelClusters2cones_byEvtID(pixelClusters,
+    ctpx = pixelClusters2cones_byEvtID(pixelClusters,
                                             source_MeV=source.energy.mono,
                                             thickness_mm=thickness,
                                             charge_speed_mm_ns=sp,
                                             to_global=[npix,sensor]  # for global coord
                                             )
 
-    # # ################## RECONSTRUCTION ####################
+    # # ################## VALIDATION / RECONSTRUCTION ####################
     sp, vp, vs = source.position.translation, 0.1, (256, 256, 256)
-    validate_psource(cones_truth, source_pos=sp, vpitch=vp, vsize=vs,
-                     plot_seq=False, plot_stack=True, plot_napari=False)
-    validate_psource(cones_tpx, source_pos=sp, vpitch=vp, vsize=vs,
-                     plot_seq=False, plot_stack=True, plot_napari=False)
+    sth = valid_psource(ctruth, src_pos=sp, vpitch=vp, vsize=vs, plot_seq=0, plot_stk=1)
+    stpx = valid_psource(ctpx, src_pos=sp, vpitch=vp, vsize=vs, plot_seq=0, plot_stk=1)

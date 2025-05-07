@@ -89,9 +89,11 @@ if __name__ == "__main__":
 
     # POINT SOURCE VALIDATION
     sp = source.position.translation
-    validate_psource(cones, source_pos=sp, vpitch=0.1, vsize=(256, 256, 256),
-                     plot_seq=False, plot_stack=True, plot_napari=True)
+    vs = (256, 256, 256)
+    sk = valid_psource(cones, src_pos=sp, vpitch=0.1, vsize=vs, plot_seq=0, plot_stk=1)
+    # plot_stack_napari(sk, vsize = vs) # TODO check with np and cp
 
     # RECONSTRUCTION
     d = {'size': sensor.size, 'position': sensor.translation}
-    reco_bp(cones, vpitch=0.1, vsize=(256, 256, 256), napari=True, det=d)
+    vol = reco_bp(cones, vpitch=0.1, vsize=vs, det=d)
+    # TODO: add 3d plot with matplotlib and optionally napari

@@ -11,7 +11,7 @@ except ImportError:
     global_log.warning(f"Cupy is not installed. Using numpy instead.")
 
 
-def reco_bp(cones_df, vpitch, vsize, napari=False, det=False):
+def reco_bp(cones_df, vpitch, vsize, det=False):
     if len(cones_df) > 1:  # avoid logging when used in point source validation
         global_log.info(f'Reconstructing volume with backprojection')
 
@@ -42,8 +42,5 @@ def reco_bp(cones_df, vpitch, vsize, napari=False, det=False):
         volume[cone_mask] += 1
 
     volume = xp.swapaxes(volume, 0, 1)
-    if napari:
-        if xp.__name__ == 'cupy': volume = volume.get()
-        display_reconstruction(volume, vsize, vpitch, det)
 
     return volume

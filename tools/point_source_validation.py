@@ -3,7 +3,7 @@ from tools.analysis_cones import *
 from tools.reco_backprojection import *
 from pathlib import Path
 import numpy as xp
-import napari
+import matplotlib.pyplot as plt
 
 try:
     import cupy as xp
@@ -24,20 +24,20 @@ except ImportError:
 # - time resolution (pile-up, singles with different eventID, true_coinc)
 # - energy/spatial resolution
 
-def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
-                     plot_stack=False, plot_napari=False):
+def valid_psource(cones_df, src_pos, vpitch, vsize, plot_seq=False,
+                  plot_stk=False):
     global_log.info(f'Offline [source validation]: START')
     stime = time.time()
 
     # Source position must be in units of voxels in vol
-    sp_vox = [int(source_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
+    sp_vox = [int(src_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]
 
     # ######## RECONSTRUCT CONE BY CONE #######################################
     z_slice_stack = xp.zeros((len(cones_df), vsize[0], vsize[1]), dtype=xp.float32)
     nb = 0  # number of bad cones
     cones_df = cones_df.reset_index(drop=True)
     for idx, cone in cones_df.iterrows():
-        vol = reco_bp(cone.to_frame().T, vpitch, vsize, napari=False)
+        vol = reco_bp(cone.to_frame().T, vpitch, vsize)
         z_slice = vol[:, :, sp_vox[2]]
         z_slice_stack[idx, :, :] = z_slice
         if z_slice[sp_vox[0], sp_vox[1]] == 0:
@@ -61,7 +61,7 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
     # ##############################################################
     # # Display stack with matplotlib (summed)
     # ##############################################################
-    if plot_stack:
+    if plot_stk:
         fig, ax = plt.subplots()
         stack = xp.sum(z_slice_stack, axis=0)
         if xp.__name__ == 'cupy': stack = xp.asnumpy(stack)
@@ -73,19 +73,9 @@ def validate_psource(cones_df, source_pos, vpitch, vsize, plot_seq=False,
         plt.tight_layout()
         plt.show()
 
-    ##############################################################
-    # Display stack with napari (scrolling)
-    ##############################################################
-    if plot_napari:
-        vargs = dict(translate=(-vsize[0] // 2, -vsize[1] // 2),
-                     axis_labels=["cone", "x", "y"])
-        if xp.__name__ == 'cupy': z_slice_stack = xp.asnumpy(z_slice_stack)
-        viewer = napari.view_image(z_slice_stack, **vargs)
-        viewer.axes.visible = True
-        napari.run()
-
     global_log.info(f"Offline [source validation]: {get_stop_string(stime)}")
 
+    return z_slice_stack, vsize
 
 def add_secondary_axes(ax, vpitch):
     Xmm = ax.secondary_xaxis('top')
@@ -123,4 +113,4 @@ if __name__ == "__main__":
     # cones_array = remove_nans(cones_array)
     # print(len(cones_array), 'cones after removing nans')
 
-    validate_psource(cones_array, vpitch, source_pos)
+    valid_psource(cones_array, vpitch, source_pos)
