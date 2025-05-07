@@ -1,2 +1,3 @@
 opengate
 awkward-pandas
+pyvista

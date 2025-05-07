@@ -2,3 +2,4 @@ opengate
 awkward-pandas
 napari[all]==0.5.5 # 0.5.6 not compatibile with latest napari-bbox 0.0.9
 napari-bbox==0.0.9
+# TODO: is pyvista also not installed with opengate, as with MacOS?
