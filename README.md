@@ -92,7 +92,7 @@ make -j4
 make install
 ```
 
-### 5) Set environment
+### 5) Set environment (each time you open a new terminal)
 ```
 export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
 ```
