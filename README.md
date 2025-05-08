@@ -27,9 +27,9 @@ Tested with:
 - Allpix²: 3.1.0
 - GPU: cupy-cuda115/128 + GeForce RTX 2080 Ti
 
-Python:
-3.9, 3.10.17 installs opengate==10.0.0
-3.11.12 installs opengate==10.0.2
+Python3 install by default:
+opengate==10.0.0 if 3.9, 3.10
+opengate==10.0.2 if 3.11
 
 ## Installation
 
@@ -53,9 +53,9 @@ source venv/bin/activate
 ### 4) Install Allpix2
  
 #### Prerequisites Ubuntu 
-Tested with Ubuntu 22.04 and 24.04
-Install BOOST `sudo apt-get install libboost-all-dev`  
-Install Eigen3 `sudo apt-get install libeigen3-dev`
+Tested with Ubuntu 22.04 and 24.04  
+Install BOOST `sudo apt-get install libboost-all-dev`      
+Install Eigen3 `sudo apt-get install libeigen3-dev`  
 Install ROOT6 binary (https://root.cern/install/):  
 ```
 wget https://root.cern/download/root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
@@ -96,6 +96,7 @@ make install
 ```
 export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
 ```
+If using PyCharm: Edit Configurations > Path to ".env files" > /path/Compton-Camera/.env
 
 ### 6) Optional: Install GPU tools
 To use the GPU-based functions (point source validation, reconstruction):
