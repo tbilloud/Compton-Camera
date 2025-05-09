@@ -96,8 +96,18 @@ make install
 ```
 export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2000000
 ```
-If using PyCharm: Edit Configurations > Path to ".env files" > /path/Compton-Camera/.env
 
+If using PyCharm:
+- Expand the box with the name of the main script on the top (near ▶)
+- Edit Configurations > Path to ".env files" > /path/Compton-Camera/.env
+- Replace the absolute project paths with your own
+
+If environment is not set properly, you might get errors like:  
+`ImportError: .../libG4geometry-cf4c216c.so: cannot allocate memory in static TLS block`
+`QObject::moveToThread: Current thread (0x5dfc4786c040) is not the object's thread...`
+`ERROR: ld.so: object ... from LD_PRELOAD cannot be preloaded (...): ignored.'`
+
+```
 ### 6) Optional: Install GPU tools
 To use the GPU-based functions (point source validation, reconstruction):
 a) Install CUDA (https://developer.nvidia.com/cuda-downloads)
