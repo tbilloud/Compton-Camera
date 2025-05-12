@@ -13,8 +13,7 @@ if __name__ == "__main__":
     sim.volume_manager.add_material_database('tools/GateMaterials.db')
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
-    # sim.g4_verbose, sim.g4_verbose_level_tracking = True, 1  # useless if visu
-    sim.verbose_level = 'DEBUG'
+    sim.verbose_level = 'INFO' # DEBUG for data preview, INFO for algo timing only
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -67,7 +66,7 @@ if __name__ == "__main__":
     source.n = 1000
     # source.activity, sim.run_timing_intervals = 100_000 * Bq, [[0, 2 * ms]]
     source.particle = "gamma"
-    source.energy.mono = 200 * keV
+    source.energy.mono = 140 * keV
     source.position.translation = [0 * mm, 0 * mm, -5 * mm]
     source.direction.type, source.direction.momentum = "momentum", [0, 0, 1]
     # source.direction.theta, source.direction.phi = theta_phi(sensor, source)
