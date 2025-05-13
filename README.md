@@ -14,18 +14,26 @@ A single python script to:
 - Visualize 3D images with napari (Linux only)
 
 Requires:
-- Linux or MacOS
+- Linux, MacOS, or (w/o plots) Windows + WSL
 - 20 GB of disk space
 - Python >= 3.10 and pip
 - Allpix²
 - Optional: CUDA, napari
 
 Tested with:
-- OS: Ubuntu 22.04 / 24.04, MacOS 15.4.1 (Allpix² does not support Windows)
-- Python: 3.10, 3.11, 3.12 (issue with OpenSSL with 3.9 and opengate-core with 3.13)
-- OpenGate: 10.0.1, 10.0.2
-- Allpix²: 3.1.0
-- GPU: cupy-cuda115/128 + GeForce RTX 2080 Ti
+- OS: 
+  - Ubuntu 22.04 / 24.04
+  - MacOS 15.4.1
+  - Windows 
+- Python:
+  - 3.10, 3.11, 3.12 (issue with OpenSSL with 3.9 and opengate-core with 3.13)
+- OpenGate:
+  - 10.0.1
+  - 10.0.2 (problem with opengate/Allpix interface, see TODOs)
+- Allpix²:
+  - 3.1.0
+- GPU: 
+  - cupy-cuda115/128 + GeForce RTX 2080 Ti
 
 Python3 install by default:
 opengate==10.0.0 if 3.9, 3.10
