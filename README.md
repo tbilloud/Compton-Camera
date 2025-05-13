@@ -7,14 +7,14 @@ A single python script to:
 - Reconstruct cones from:
   - Geant4/Gate 'hits'
   - Gate 'singles'
-  - Allpix2 'pixel hits' (WIP)
+  - Allpix² 'pixel hits' (WIP)
   - measured data (WIP)
 - Validate simulation/measurement of gamma point sources
 - Reconstruct 3D image with basic back-projection
 - Visualize 3D images with napari (Linux only)
 
 Requires:
-- Linux, MacOS, or (w/o plots) Windows + WSL
+- Linux, MacOS, or Windows + WSL
 - 20 GB of disk space
 - Python >= 3.10 and pip
 - Allpix²
@@ -24,7 +24,7 @@ Tested with:
 - OS: 
   - Ubuntu 22.04 / 24.04
   - MacOS Sequoia (15.4.1)
-  - Windows 
+  - Windows + WSL Ubuntu 22.04 (some QT issues, solved with ChatGPT)
 - Python:
   - 3.10, 3.11, 3.12 (issue with OpenSSL with 3.9 and opengate-core with 3.13)
 - OpenGate:
@@ -57,12 +57,12 @@ source venv/bin/activate
 ```
 
 ### 3) Install required python packages
-Linux: `pip install -r requirements-OS.txt`  
+Ubuntu: `pip install -r requirements-OS.txt`  
 MacOS: `pip install -r requirements-macos.txt`
 
-### 4) Install Allpix2
+### 4) Install Allpix²
  
-#### Prerequisites Ubuntu
+#### Prerequisites Ubuntu 
 ```
 sudo apt-get install libboost-all-dev # installs BOOST
 sudo apt-get install libeigen3-dev # installs Eigen3
@@ -70,23 +70,23 @@ wget https://root.cern/download/root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.t
 tar -xzvf root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
 source root/bin/thisroot.sh # installs ROOT6
 ```
+Note: adapt lines 3-4 to your system (https://root.cern/install/all_releases/)
 
 #### Prerequisites MacOS 
-Tested with Sequoia 15.4.1
-- Install Apple's Command Line Developer Tools `xcode-select --install`
-- Install CMake (https://cmake.org/download) and then:
-`sudo /Applications/CMake.app/Contents/bin/cmake-gui --install`
-- Install ROOT6 (https://root.cern/install). Current version (6.32.12, April 2025):
-  - Fails with
-    - binary: MacOS 15.4.1 prevents running because of security issues 
-    - macports: dependency graphviz fails to install 
-    - source: cmake configuration fails, libatomic not found
-  - Succeeds with
-    - homebrew: installs ROOT 6.34.08 built with C++17 (as of )
-- Install BOOST `brew install boost`
-- Install Eigen3 `brew install eigen`
+```
+xcode-select --install # install Command Line Developer Tools, if not already there
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # installs brew
+brew install cmake # installs CMake
+brew install boost # installs BOOST
+brew install eigen # installs Eigen3
+brew install root # installs ROOT6
+```
+Notes:
+- Only tested with brew. Other ways might work too (macports, or from source).
+- As of April 2025, brew installs ROOT 6.34.08 built with C++17 (needed by Allpix²)
 
-#### Then install Allpix2 without Geant4:  
+
+#### Then install Allpix² without Geant4:  
 https://allpix-squared.docs.cern.ch/docs/02_installation/  
 ```
 cd allpix
@@ -122,8 +122,11 @@ b) Install the Cupy package suited to your CUDA version, e.g.
 `pip install cupy-cuda115`
 
 ## Getting started
-Run the test:  
-`python3 main_basic.py`  or, if using Allpix2, `python3 main_allpix.py`
+Run the tests:  
+```
+python3 main_basic.py
+python3 main_allpix.py`
+```
 The 1st time you run a simulation, Gate10 will install Geant4 datasets, which can take a while. This is done only once.
 
 In main.py, the 1st part (code until block 'ANALYSIS AND RECONSTRUCTION') is the Gate 10 simulation. See user manual:  
@@ -135,7 +138,7 @@ Then, several functions are available. Step-by-step:
 - singles, which are group of hits per pixel, with analyze_singles()
 2) Simulate pixel hits:
 - from Gate singles with gSingles2pixelHits()
-- from Allpix2 output with gHits2allpix2pixelHits()
+- from Allpix² output with gHits2allpix2pixelHits()
 3) Reconstruct cones:
 - from Gate4 hits with gHits2cones_byEvtID()
 - from pixel hits (WIP)
@@ -174,23 +177,23 @@ objc[16117]: Class RunL... is implemented in both .../opengate_core/.dylibs/QtCo
 Solution: TODO !
 
 
-## Allpix2
+## Allpix²
 
-Allpix2 is a C++ software for precise simulation of semiconductor pixel detectors.
+Allpix² is a C++ software for precise simulation of semiconductor pixel detectors.
 It simulates the transport of charge carriers in semiconductor sensors and their signal induction.
 It is used primarily for detector R&D in particle physics.  
 https://cern.ch/allpix-squared
 
 
-Allpix2 can read the hits root file from Gate.
+Allpix² can read the hits root file from Gate.
 Combined with Gate10, the entire simulation can be done with a single python file, using the function
 gHits2allpix2pixelHits() after the sim.run() in the main.py script. It does the following:
 1) run Gate10 and creates the hits root file
-2) generate the three .conf files needed by Allpix2
-3) run Allpix2 and creates the output files data.txt and modules.root in the sub-folder 'allpix'
+2) generate the three .conf files needed by Allpix²
+3) run Allpix² and creates the output files data.txt and modules.root in the sub-folder 'allpix'
 4) read data.txt and return a pandas dataframe with the pixel hits
 
-An Allpix2 simulation needs 3 configuration (.conf) files:
+An Allpix² simulation needs 3 configuration (.conf) files:
 - detector geometry
 - detector model
 - simulation parameters
