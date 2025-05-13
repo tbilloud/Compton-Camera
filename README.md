@@ -23,7 +23,7 @@ Requires:
 Tested with:
 - OS: 
   - Ubuntu 22.04 / 24.04
-  - MacOS 15.4.1
+  - MacOS Sequoia (15.4.1)
   - Windows 
 - Python:
   - 3.10, 3.11, 3.12 (issue with OpenSSL with 3.9 and opengate-core with 3.13)
@@ -41,7 +41,8 @@ opengate==10.0.2 if 3.11
 
 ## Installation
 
-If not already installed, install python (e.g. with pyenv on MacOS) and pip
+If not already installed, install a suitable python version and pip.
+MacOS: use pyenv for example
 
 ### 1) Download or clone: 
 ```
@@ -56,19 +57,18 @@ source venv/bin/activate
 ```
 
 ### 3) Install required python packages
-`pip install -r requirements-OS.txt` (OS is `linux` or `macos` according to your system)
+Linux: `pip install -r requirements-OS.txt`  
+MacOS: `pip install -r requirements-macos.txt`
 
 ### 4) Install Allpix2
  
-#### Prerequisites Ubuntu 
-Tested with Ubuntu 22.04 and 24.04  
-Install BOOST `sudo apt-get install libboost-all-dev`      
-Install Eigen3 `sudo apt-get install libeigen3-dev`  
-Install ROOT6 binary (https://root.cern/install/):  
+#### Prerequisites Ubuntu
 ```
+sudo apt-get install libboost-all-dev # installs BOOST
+sudo apt-get install libeigen3-dev # installs Eigen3
 wget https://root.cern/download/root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
 tar -xzvf root_v6.32.10.Linux-ubuntu22.04-x86_64-gcc11.4.tar.gz
-source root/bin/thisroot.sh
+source root/bin/thisroot.sh # installs ROOT6
 ```
 
 #### Prerequisites MacOS 
@@ -115,7 +115,6 @@ If environment is not set properly, you might get errors like:
 `QObject::moveToThread: Current thread (0x5dfc4786c040) is not the object's thread...`
 `ERROR: ld.so: object ... from LD_PRELOAD cannot be preloaded (...): ignored.'`
 
-```
 ### 6) Optional: Install GPU tools
 To use the GPU-based functions (point source validation, reconstruction):
 a) Install CUDA (https://developer.nvidia.com/cuda-downloads)
