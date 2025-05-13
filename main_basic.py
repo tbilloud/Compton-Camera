@@ -1,10 +1,10 @@
 import opengate_core
 from opengate.managers import Simulation
 from opengate.geometry.volumes import *
+from tools.analysis_pixelHits import *
 from tools.analysis_pixelClusters import pixelHits2pixelClusters
 from tools.point_source_validation import *
 from tools.reco_backprojection import *
-from tools.allpix import *
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
