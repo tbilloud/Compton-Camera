@@ -95,14 +95,18 @@ include = "PixelHit"
     return event_time_offset_flag
 
 
+    # TODO: allow setting important parameters in main gate script
+    # TODO: is it valid for CdTe / GaAs ?
+    # TODO: use CSADigitizer in 'precise' config
+    # TODO: speed up precise config (e.g. charge groups etc)
+    # TODO: check/automatize weighting potential generation for precise config
 configurations = {
-    # TODO: is Jacoboni mobility model working with CdTe / GaAs ?
     "fast": """
 [ElectricFieldReader]
 model = "linear"
 bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
 [ProjectionPropagation] 
-# mobility model is Jacoboni
+# mobility model is Jacoboni 
 temperature = 293K
 integration_time = 1000s # default 25ns might stop charge propagation
 [PulseTransfer]
@@ -112,35 +116,42 @@ threshold = 1e # 0e turns off ToA...
 threshold_smearing = 0e
 electronics_noise = 0e
 """,
-    # TODO: allow to set important parameters
     "default": """ 
 [ElectricFieldReader]
 model = "constant"
 bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
 [GenericPropagation]
-integration_time = 1000s # default 25ns might stop charge propagation
+integration_time = 1us # default 25ns might stop propagation
 mobility_model = "constant"
 mobility_electron = 1000cm*cm/V/s
 mobility_hole = 100cm*cm/V/s
-propagate_electrons = true
-propagate_holes = false
 [PulseTransfer]
 timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
 [DefaultDigitizer]
 threshold = 1e # 0e turns off ToA... 
 threshold_smearing = 0e
 electronics_noise = 0e
-tdc_resolution = 16bit # if 0 (default) TOT is in charge, not clock cycles
-qdc_resolution = 16bit # if 0 (default) ToA is in ns, not clock cycles
 """,
-    # TODO:
     "precise": """ 
 [ElectricFieldReader]
+model="constant"
+bias_voltage=-1000V
 [WeightingPotentialReader]
+model = "mesh"
+file_name = "weightingpotential_timepix1mm.apf"
+field_mapping = "PIXEL_FULL"
 [TransientPropagation]
-[InducedTransfer]
-[CSADigitizer]
-
+mobility_model = "constant"
+mobility_electron = 1000cm*cm/V/s
+mobility_hole = 500cm*cm/V/s # holes always propagated
+integration_time = 1us  # default 25ns might stop propagation
+timestep = 0.1ns
+distance = 0
+[PulseTransfer]
+[DefaultDigitizer]
+threshold = 1e # 0e turns off ToA... 
+threshold_smearing = 0e
+electronics_noise = 0e
 """
 }
 
