@@ -15,7 +15,6 @@ def run_allpix(sim,
                config='default'):
     stime = time.time()
 
-    # TODO: sync different digitizer chains with output formats
     hits_actor = sim.actor_manager.get_actor("Hits")
     hits_file = sim.output_dir + '/' + hits_actor.output_filename
     gateHits_df = uproot.open(hits_file)['Hits'].arrays(library='pd')
@@ -100,6 +99,7 @@ include = "PixelHit"
     # TODO: use CSADigitizer in 'precise' config
     # TODO: speed up precise config (e.g. charge groups etc)
     # TODO: check/automatize weighting potential generation for precise config
+    # TODO: deal with different units for pixelHits (energy/charge/bits for TOT, time/bits for TOA)
 configurations = {
     "fast": """
 [ElectricFieldReader]
