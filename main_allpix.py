@@ -20,7 +20,7 @@ if __name__ == "__main__":
     npix, pitch, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Vacuum"
     sensor = sim.add_volume("Box", "sensor")
-    sensor.material = "cadmium_telluride"
+    sensor.material = "cadmium_telluride" # or 'Silicon'
     sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * mm, 0 * mm, 5 * mm]
     # sensor.rotation = R.from_euler('xyz', [0,45,0], degrees=True).as_matrix()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     hits_df = uproot.open(hits_path)['Hits'].arrays(library='pd')
 
     # ################# PIXEL HITS ########################
-    pixelHits = gHits2allpix2pixelHits(sim, npix, config='precise', log_level='FATAL')
+    pixelHits = gHits2allpix2pixelHits(sim, npix, config='default', log_level='FATAL')
     # TODO: check warning about (mobility?) model not adapted to CdTe
 
     # ################# PIXEL CLUSTERS ####################
