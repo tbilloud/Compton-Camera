@@ -1,4 +1,3 @@
-import sys
 import opengate_core
 from opengate.managers import Simulation
 from opengate.geometry.volumes import *
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     hits_df = uproot.open(hits_path)['Hits'].arrays(library='pd')
 
     # ################# PIXEL HITS ########################
-    pixelHits = gHits2allpix2pixelHits(sim, npix, config='default', log_level='FATAL')
+    pixelHits = gHits2allpix2pixelHits(sim, npix, config='precise', log_level='FATAL')
     # TODO: check warning about (mobility?) model not adapted to CdTe
 
     # ################# PIXEL CLUSTERS ####################

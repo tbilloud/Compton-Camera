@@ -1,41 +1,53 @@
-import sys
 import subprocess
-import time
-
-import uproot
 from scipy.spatial.transform import Rotation as R
 import warnings
-from opengate.logger import global_log
 from tools.analysis_pixelHits import *
 
 
 def run_allpix(sim,
-               binary_path='allpix/allpix-squared/install-noG4/bin/allpix',
+               binary_path='allpix/allpix-squared/install-noG4/bin/',
                output_dir='allpix/', log_level='FATAL',
                config='default'):
+    # ==========================
+    # == INPUTS & INIT        ==
+    # ==========================
+
+    # Measure time spent with Allpix (run, and if used, weighting potential calculation)
     stime = time.time()
 
+    # Fetch inputs
     hits_actor = sim.actor_manager.get_actor("Hits")
     hits_file = sim.output_dir + '/' + hits_actor.output_filename
     gateHits_df = uproot.open(hits_file)['Hits'].arrays(library='pd')
+    sensor = sim.volume_manager.get_volume("sensor")
+    source = sim.source_manager.get_source("source")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        angles = R.from_matrix(sensor.rotation).as_euler('xyz', degrees=True)
+
+    # Prevent two competing visualizations
     if sim.visu is True:
         sys.exit("Allpix cannot be run with Gate visualization enabled")
     else:
         global_log.info(f"Offline [Allpix2]: START")
         global_log.debug(f"Input {hits_file}, {len(gateHits_df)} gHits")
 
+    # Check that Gate geometry was adapted to Allpix
     try:
         pixel = sim.volume_manager.get_volume("pixel_param")
     except Exception:
-        global_log.error(f"Pixels must be defined with RepeatParametrisedVolume() in Gate. Call the volume 'pixel'.")
+        global_log.error(
+            f"Pixels must be defined with RepeatParametrisedVolume() in Gate. Call the volume 'pixel'.")
         sys.exit()
 
-    sensor = sim.volume_manager.get_volume("sensor")
-    source = sim.source_manager.get_source("source")
+    # Prepare the weighting potential file
+    if config == 'precise':
+        wp_fname = f"pitch{int(pixel.translation[0] * 1000)}um_thick{int(sensor.size[2] * 1000)}um"
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        angles = R.from_matrix(sensor.rotation).as_euler('xyz', degrees=True)
+    # ==========================
+    # == PRODUCE CONFIG FILES ==
+    # ==========================
+
     geometry_conf_content = f"""[0_0]
 type = "detector_model"
 position = {" ".join([f"{sensor.translation[i]}mm" for i in range(3)])}
@@ -52,6 +64,66 @@ bump_sphere_radius = 9.0um
 bump_cylinder_radius = 7.0um
 bump_height = 20.0um
     """
+
+    # TODO: allow setting important parameters in main gate script
+    # TODO: is Jacoboni model valid for CdTe / GaAs ?
+    # TODO: use CSADigitizer in 'precise' config
+    # TODO: speed up precise config (e.g. charge groups etc)
+    # TODO: deal with different units for pixelHits (energy/charge/bits for TOT, time/bits for TOA)
+    configurations = {
+        "fast": """
+    [ElectricFieldReader]
+    model = "linear"
+    bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
+    [ProjectionPropagation] 
+    # mobility model is Jacoboni 
+    temperature = 293K
+    integration_time = 1000s # default 25ns might stop charge propagation
+    [PulseTransfer]
+    # timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
+    [DefaultDigitizer]
+    threshold = 1e # 0e turns off ToA... 
+    threshold_smearing = 0e
+    electronics_noise = 0e
+    """,
+        "default": """ 
+    [ElectricFieldReader]
+    model = "constant"
+    bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
+    [GenericPropagation]
+    integration_time = 1us # default 25ns might stop propagation
+    mobility_model = "constant"
+    mobility_electron = 1000cm*cm/V/s
+    mobility_hole = 100cm*cm/V/s
+    [PulseTransfer]
+    timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
+    [DefaultDigitizer]
+    threshold = 1e # 0e turns off ToA... 
+    threshold_smearing = 0e
+    electronics_noise = 0e
+    """,
+        "precise": f""" 
+    [ElectricFieldReader]
+    model="constant"
+    bias_voltage=-1000V
+    [WeightingPotentialReader]
+    model = "mesh"
+    file_name = "{wp_fname}_weightingpotential.apf"
+    field_mapping = "PIXEL_FULL"
+    [TransientPropagation]
+    mobility_model = "constant"
+    mobility_electron = 1000cm*cm/V/s
+    mobility_hole = 500cm*cm/V/s # holes always propagated
+    integration_time = 1us  # default 25ns might stop propagation
+    timestep = 0.1ns
+    distance = 0
+    [PulseTransfer]
+    [DefaultDigitizer]
+    threshold = 1e # 0e turns off ToA... 
+    threshold_smearing = 0e
+    electronics_noise = 0e
+    """
+    }
 
     main_conf_content = f"""[Allpix]
 log_level = {log_level}
@@ -82,11 +154,26 @@ include = "PixelHit"
     with open(output_dir + 'main.conf', 'w') as main_conf_file:
         main_conf_file.write(main_conf_content)
 
-    subprocess.run([binary_path, '-c', output_dir + 'main.conf'], check=True)
+    # ===========================
+    # === RUN BINARIES        ===
+    # ===========================
+
+    if config == 'precise':
+        if os.path.isfile(f'allpix/{wp_fname}_weightingpotential.apf'):
+            global_log.info(f"Using {wp_fname + '_weightingpotential.apf'}")
+        else:
+            global_log.warning(f"Weighting potential file not found. Generating it...")
+            subprocess.run([binary_path + 'generate_potential', '--model',
+                            output_dir + 'detector_model.conf', '--output',
+                            f'allpix/{wp_fname}', '-v', log_level],
+                           check=True)
+
+    subprocess.run([binary_path + 'allpix', '-c', output_dir + 'main.conf'], check=True)
 
     event_time_offset_flag = False
     if source.n:
-        global_log.warning(f"Use source.activity (not source.n) for realistic TOA. Adding 1us/event.")
+        global_log.warning(
+            f"Use source.activity (not source.n) for realistic TOA. Adding 1us/event.")
         event_time_offset_flag = True
 
     global_log.info(f"Offline [Allpix2]: {get_stop_string(stime)}")
@@ -94,71 +181,9 @@ include = "PixelHit"
     return event_time_offset_flag
 
 
-    # TODO: allow setting important parameters in main gate script
-    # TODO: is it valid for CdTe / GaAs ?
-    # TODO: use CSADigitizer in 'precise' config
-    # TODO: speed up precise config (e.g. charge groups etc)
-    # TODO: check/automatize weighting potential generation for precise config
-    # TODO: deal with different units for pixelHits (energy/charge/bits for TOT, time/bits for TOA)
-configurations = {
-    "fast": """
-[ElectricFieldReader]
-model = "linear"
-bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
-[ProjectionPropagation] 
-# mobility model is Jacoboni 
-temperature = 293K
-integration_time = 1000s # default 25ns might stop charge propagation
-[PulseTransfer]
-# timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
-[DefaultDigitizer]
-threshold = 1e # 0e turns off ToA... 
-threshold_smearing = 0e
-electronics_noise = 0e
-""",
-    "default": """ 
-[ElectricFieldReader]
-model = "constant"
-bias_voltage = -1000V # pixel side, - to collect electrons, + to collect holes
-[GenericPropagation]
-integration_time = 1us # default 25ns might stop propagation
-mobility_model = "constant"
-mobility_electron = 1000cm*cm/V/s
-mobility_hole = 100cm*cm/V/s
-[PulseTransfer]
-timestep = 1.6ns # 0.01ns by default, but Timepix3 clock is 1.6ns
-[DefaultDigitizer]
-threshold = 1e # 0e turns off ToA... 
-threshold_smearing = 0e
-electronics_noise = 0e
-""",
-    "precise": """ 
-[ElectricFieldReader]
-model="constant"
-bias_voltage=-1000V
-[WeightingPotentialReader]
-model = "mesh"
-file_name = "weightingpotential_timepix1mm.apf"
-field_mapping = "PIXEL_FULL"
-[TransientPropagation]
-mobility_model = "constant"
-mobility_electron = 1000cm*cm/V/s
-mobility_hole = 500cm*cm/V/s # holes always propagated
-integration_time = 1us  # default 25ns might stop propagation
-timestep = 0.1ns
-distance = 0
-[PulseTransfer]
-[DefaultDigitizer]
-threshold = 1e # 0e turns off ToA... 
-threshold_smearing = 0e
-electronics_noise = 0e
-"""
-}
-
-
 # TODO: I've seen negative ToT values in data.txt
 def gHits2allpix2pixelHits(sim, npix,
-                           binary_path='allpix/allpix-squared/install-noG4/bin/allpix',
+                           binary_path='allpix/allpix-squared/install-noG4/bin/',
                            config='default',
                            log_level='FATAL'):
     time_offset = run_allpix(sim, binary_path, output_dir='allpix/',
