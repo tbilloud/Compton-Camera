@@ -165,7 +165,7 @@ include = "PixelHit"
 
     if config == 'precise':
         if os.path.isfile(f'allpix/{wp_fname}_weightingpotential.apf'):
-            global_log.info(f"Using {wp_fname + '_weightingpotential.apf'}")
+            global_log.info(f"Offline [Allpix2]: Using {wp_fname + '_weightingpotential.apf'}")
         else:
             global_log.warning(f"Weighting potential file not found. Generating it...")
             subprocess.run([binary_path + 'generate_potential', '--model',
