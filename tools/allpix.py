@@ -43,6 +43,11 @@ def run_allpix(sim,
     # Prepare the weighting potential file
     if config == 'precise':
         wp_fname = f"pitch{int(pixel.translation[0] * 1000)}um_thick{int(sensor.size[2] * 1000)}um"
+    elif config == 'fast':
+        if sensor.material != 'Silicon':
+            global_log.error(
+                f"The 'fast' configuration only works with Silicon sensors.")
+            sys.exit()
 
     # ==========================
     # == PRODUCE CONFIG FILES ==
@@ -108,7 +113,7 @@ bump_height = 20.0um
     bias_voltage=-1000V
     [WeightingPotentialReader]
     model = "mesh"
-    file_name = "{wp_fname}_weightingpotential.apf"
+    file_name = "{wp_fname if config=='precise' else ''}_weightingpotential.apf"
     field_mapping = "PIXEL_FULL"
     [TransientPropagation]
     mobility_model = "constant"
