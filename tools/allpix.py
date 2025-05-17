@@ -69,6 +69,7 @@ bump_height = 20.0um
     # TODO: use CSADigitizer in 'precise' config
     # TODO: speed up precise config (e.g. charge groups etc)
     # TODO: deal with different units for pixelHits (energy/charge/bits for TOT, time/bits for TOA)
+    # TODO: fix eventID +1 increment compared to gate
     configurations = {
         "fast": """
     [ElectricFieldReader]
@@ -180,7 +181,6 @@ include = "PixelHit"
     return event_time_offset_flag
 
 
-# TODO: I've seen negative ToT values in data.txt
 def gHits2allpix2pixelHits(sim, npix,
                            binary_path='allpix/allpix-squared/install-noG4/bin/',
                            config='default',
