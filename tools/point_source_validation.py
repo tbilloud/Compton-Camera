@@ -26,8 +26,15 @@ except ImportError:
 
 def valid_psource(cones_df, src_pos, vpitch, vsize, plot_seq=False,
                   plot_stk=False):
-    global_log.info(f'Offline [source validation]: START')
     stime = time.time()
+    global_log.info(f'Offline [source validation]: START')
+    if not len(cones_df):
+        global_log.error(f"Empty input (no cones in dataframe).")
+        global_log.info(f"Offline [source validation]: {get_stop_string(stime)}")
+        return
+    else:
+        global_log.debug(f"Offline [cones tpx]: Input cone dataframe with ({len(cones_df)} entries)")
+
 
     # Source position must be in units of voxels in vol
     sp_vox = [int(src_pos[i] / vpitch) + (vsize[i] // 2) for i in range(3)]

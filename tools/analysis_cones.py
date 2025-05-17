@@ -117,9 +117,15 @@ def pixelClusters2cones_byEvtID(pixelClusters, source_MeV, thickness_mm,
         sensor.rotation = 3D rotation matrix
     """
 
-    global_log.info(f"Offline [cones tpx]: START")
-    global_log.debug(f"Input pixel clusters dataframe")
     stime = time.time()
+    global_log.info(f"Offline [cones tpx]: START")
+
+    if not len(pixelClusters):
+        global_log.error(f"Empty input (no clusters in dataframe).")
+        global_log.info(f"Offline [pixelClusters]: {get_stop_string(stime)}")
+        return []
+    else:
+        global_log.debug(f"Offline [cones tpx]: Input pixel cluster dataframe with ({len(pixelClusters)} entries)")
 
     grouped = pixelClusters.groupby(EVENTID)
     grouped = [group for group in grouped if len(group[1]) == 2]
