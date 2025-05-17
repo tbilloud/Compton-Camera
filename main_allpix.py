@@ -1,9 +1,10 @@
+import sys
+
 import opengate_core
 from opengate.managers import Simulation
 from opengate.geometry.volumes import *
 from tools.analysis_pixelClusters import *
 from tools.point_source_validation import *
-from tools.reco_backprojection import *
 from tools.allpix import *
 
 if __name__ == "__main__":
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 1000
+    source.n = 200
     # source.activity, sim.run_timing_intervals = 100_000 * Bq, [[0, 2 * ms]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
@@ -106,6 +107,3 @@ if __name__ == "__main__":
     sp, vp, vs = source.position.translation, 0.1, (256, 256, 256)
     sth = valid_psource(ctruth, src_pos=sp, vpitch=vp, vsize=vs, plot_seq=0, plot_stk=1)
     stpx = valid_psource(ctpx, src_pos=sp, vpitch=vp, vsize=vs, plot_seq=0, plot_stk=1)
-
-    # ################## RECONSTRUCTION ####################
-    # TODO
