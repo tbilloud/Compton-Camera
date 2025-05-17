@@ -41,8 +41,7 @@ def run_allpix(sim,
         sys.exit()
 
     # Prepare the weighting potential file
-    if config == 'precise':
-        wp_fname = f"pitch{int(pixel.translation[0] * 1000)}um_thick{int(sensor.size[2] * 1000)}um"
+    wp_fname = f"pitch{int(pixel.translation[0] * 1000)}um_thick{int(sensor.size[2] * 1000)}um" if config == 'precise' else ''
 
     # ==========================
     # == PRODUCE CONFIG FILES ==
