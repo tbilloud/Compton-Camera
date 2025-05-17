@@ -1,13 +1,11 @@
-import sys
-
 import opengate_core
 from opengate.managers import Simulation
-from opengate.geometry.volumes import *
 from tools.analysis_pixelClusters import *
 from tools.point_source_validation import *
 from tools.allpix import *
 
 if __name__ == "__main__":
+    check_gate_version()
     sim, sim.output_dir = Simulation(), "output"
     um, mm, keV, MeV, deg, Bq, ms, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.ms, g4_units.s
     sim.volume_manager.add_material_database('tools/GateMaterials.db')

@@ -1,8 +1,9 @@
 # Some utility functions
 # WARNING: For print functions, make sure that dataframe columns are present in simulation settings (c.f. actor attribtues)
-
+import sys
 import time
 import numpy as np
+import importlib.metadata
 from opengate.logger import global_log
 from opengate.utility import g4_units
 from opengate.geometry.volumes import RepeatParametrisedVolume
@@ -219,7 +220,7 @@ def charge_speed_mm_ns(mobility_cm2_Vs, bias_V, thick_mm):
 
 
 def setup_pixels(sim, npix, sensor, pitch, thickness):
-    if not sim.visu: # because 256 x 256 pixels are too heavy for visualization
+    if not sim.visu:  # because 256 x 256 pixels are too heavy for visualization
         pixel = sim.add_volume("Box", "pixel")
         pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
         pixel.material = sensor.material
@@ -229,3 +230,8 @@ def setup_pixels(sim, npix, sensor, pitch, thickness):
     else:
         global_log.warning("Simulation was ran without pixels, analysis will not work.")
 
+
+def check_gate_version():
+    if importlib.metadata.version("opengate") != "10.0.1":
+        global_log.error("opengate version not supported: pip install opengate==10.0.1")
+        sys.exit()
