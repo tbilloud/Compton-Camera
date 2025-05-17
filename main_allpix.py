@@ -25,15 +25,7 @@ if __name__ == "__main__":
     sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * mm, 0 * mm, 5 * mm]
     # sensor.rotation = R.from_euler('xyz', [0,45,0], degrees=True).as_matrix()
-    if not sim.visu: # because 256 x 256 pixels are too heavy for visualization
-        pixel = sim.add_volume("Box", "pixel")
-        pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
-        pixel.material = sensor.material
-        par = RepeatParametrisedVolume(repeated_volume=pixel)
-        par.linear_repeat, par.translation = [npix, npix, 1], [pitch, pitch, 0]
-        sim.volume_manager.add_volume(par)
-    else:
-        global_log.warning("Simulation was ran without pixels, analysis will not work.")
+    setup_pixels(sim, npix, sensor, pitch, thickness)
 
     ## ===========================
     ## ==  PHYSICS              ==
