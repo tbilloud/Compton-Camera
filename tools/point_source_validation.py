@@ -33,7 +33,7 @@ def valid_psource(cones_df, src_pos, vpitch, vsize, plot_seq=False,
         global_log.info(f"Offline [source validation]: {get_stop_string(stime)}")
         return
     else:
-        global_log.debug(f"Offline [cones tpx]: Input cone dataframe with ({len(cones_df)} entries)")
+        global_log.debug(f"Input cone dataframe with ({len(cones_df)} entries)")
 
 
     # Source position must be in units of voxels in vol
@@ -63,7 +63,7 @@ def valid_psource(cones_df, src_pos, vpitch, vsize, plot_seq=False,
             plt.tight_layout()
             plt.show()
 
-    global_log.debug(f"Offline [source validation]: {nb} cones not intersecting source")
+    global_log.debug(f"{nb} cones not intersecting source")
 
     # ##############################################################
     # # Display stack with matplotlib (summed)

@@ -88,7 +88,7 @@ def pixelHits2pixelClusters(pixelHits, npix, window_ns, f, **kwargs):
         global_log.info(f"Offline [pixelClusters]: {get_stop_string(stime)}")
         return []
     else:
-        global_log.debug(f"Offline [pixelClusters]: Input pixel hits dataframe with ({len(pixelHits)} entries)")
+        global_log.debug(f"Input pixel hits dataframe with ({len(pixelHits)} entries)")
 
     pixelHits = pixelHits.sort_values(by=TOA)
 
