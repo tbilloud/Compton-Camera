@@ -5,7 +5,7 @@ from napari_bbox import BoundingBoxLayer
 def plot_stack_napari(z_slice_stack, vsize):
     """
     Displays a 3D stack of slices using Napari for visualization.
-    Compared to matplotlibm it allows for scrolling through the slices
+    Compared to matplotlib, it allows for scrolling through the slices
 
     Parameters:
     -----------
