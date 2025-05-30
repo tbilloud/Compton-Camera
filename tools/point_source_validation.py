@@ -1,9 +1,15 @@
-from opengate.logger import global_log
 from tools.analysis_cones import *
 from tools.reco_backprojection import *
 from pathlib import Path
 import numpy as xp
 import matplotlib.pyplot as plt
+
+try:
+    from opengate.logger import global_log
+except ImportError:
+    import logging
+    global_log = logging.getLogger("dummy")
+    global_log.addHandler(logging.NullHandler())
 
 try:
     import cupy as xp

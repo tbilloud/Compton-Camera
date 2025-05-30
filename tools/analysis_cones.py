@@ -8,7 +8,13 @@ import pandas
 import uproot
 from .analysis_pixelHits import PIX_X_ID, PIX_Y_ID, EVENTID, ENERGY_keV, TOA
 from tools.utils import *
-from opengate.logger import global_log
+
+try:
+    from opengate.logger import global_log
+except ImportError:
+    import logging
+    global_log = logging.getLogger("dummy")
+    global_log.addHandler(logging.NullHandler())
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)

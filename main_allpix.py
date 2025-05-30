@@ -1,8 +1,12 @@
 import opengate_core
 from opengate.managers import Simulation
+from opengate.utility import g4_units
 from tools.analysis_pixelClusters import *
 from tools.point_source_validation import *
 from tools.allpix import *
+from tools.utils_opengate import setup_pixels
+
+um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
 
 if __name__ == "__main__":
     check_gate_version()
@@ -11,7 +15,7 @@ if __name__ == "__main__":
     sim.volume_manager.add_material_database('tools/GateMaterials.db')
     sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
-    sim.verbose_level = 'INFO' # DEBUG for data preview, INFO for algo timing only
+    sim.verbose_level = 'DEBUG' # DEBUG for data preview, INFO for algo timing only
 
     # ===========================
     # ==   GEOMETRY            ==
@@ -53,7 +57,7 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.n = 200
+    source.n = 108
     # source.activity, sim.run_timing_intervals = 100_000 * Bq, [[0, 2 * ms]]
     source.particle = "gamma"
     source.energy.mono = 140 * keV
@@ -84,14 +88,16 @@ if __name__ == "__main__":
     # #################### CONES ##########################
     # =======> GROUND TRUTH <=======
     ctruth = gHits2cones_byEvtID(hits_path, source.energy.mono)
+    ctruth.to_csv(Path(sim.output_dir) / 'cones_truth.csv', index=False)
     # # =========> TIMEPIX <==========
-    sp = charge_speed_mm_ns(mobility_cm2_Vs=1000, bias_V=1000, thick_mm=sensor.size[2])
+    spd = charge_speed_mm_ns(mobility_cm2_Vs=1000, bias_V=1000, thick_mm=sensor.size[2])
     ctpx = pixelClusters2cones_byEvtID(pixelClusters,
                                             source_MeV=source.energy.mono,
                                             thickness_mm=thickness,
-                                            charge_speed_mm_ns=sp,
+                                            charge_speed_mm_ns=spd,
                                             to_global=[npix,sensor]  # for global coord
                                             )
+    ctpx.to_csv(Path(sim.output_dir) / 'cones_timepix.csv', index=False)
 
     # ########## VALIDATION WITH POINT SOURCE #############
     sp, vp, vs = source.position.translation, 0.1, (256, 256, 256)

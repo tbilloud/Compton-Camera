@@ -1,9 +1,11 @@
 import opengate_core
 from opengate.managers import Simulation
+from opengate.utility import g4_units
 from tools.analysis_pixelHits import *
 from tools.analysis_pixelClusters import pixelHits2pixelClusters
 from tools.point_source_validation import *
 from tools.reco_backprojection import *
+from tools.utils_opengate import setup_pixels, theta_phi
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"

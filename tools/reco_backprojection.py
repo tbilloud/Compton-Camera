@@ -1,7 +1,13 @@
 # Basic backprojection reconstruction for Compton camera data
 # It's slow, ~1 sec per cone -> install cupy if possible
 
-from opengate.logger import global_log
+try:
+    from opengate.logger import global_log
+except ImportError:
+    import logging
+    global_log = logging.getLogger("dummy")
+    global_log.addHandler(logging.NullHandler())
+
 from tools.display_reconstruction import *
 import numpy as xp
 
