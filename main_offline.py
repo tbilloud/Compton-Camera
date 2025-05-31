@@ -1,5 +1,6 @@
-# Reconstruct images from cone data (from Gate/Allpix simulation or measured):
-# Can be used with a simulation-free venv, with requirements-offline.txt (see readme.md)
+# Reconstruct images from cone data
+# Data can be measured or from Gate/Allpix simulation
+# Can be used with an offline venv (and should be on MacOS): see README.md
 
 # ===========================
 # ==   INPUT               ==
@@ -16,7 +17,8 @@ vp, vs = 0.1, (256, 256, 256)
 
 # Read cones from CSV file
 import pandas as pd
-cones = pd.read_csv('output/cones_truth.csv')
+cones = pd.read_csv('output/cones_comb.csv')
+print(cones)
 
 # ===========================
 # = POINT SOURCE VALIDATION =
