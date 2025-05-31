@@ -1,9 +1,6 @@
 # Functions to process pixelHits dataframes
 
 import os
-import sys
-import time
-
 import pandas
 import pandas as pd
 import uproot
