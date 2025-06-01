@@ -1,8 +1,8 @@
-from tools.analysis_cones import *
 from tools.reco_backprojection import *
-from pathlib import Path
+from tools.utils import get_stop_string
 import numpy as xp
 import matplotlib.pyplot as plt
+import time
 
 try:
     from opengate.logger import global_log
@@ -101,7 +101,7 @@ def add_secondary_axes(ax, vpitch):
     Ymm.set_yticklabels(xp.round(ax.get_yticks() * vpitch, 2), color='red')
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # ###### READING Gate9.2 sequenceCoincidence.root files ##############
     # fname, E0_MeV, vpitch, source_pos = Path('../Gate9/output'), 0.140, 200, [0, 0, 0]
     # nSingles_max = False  # maximum number of singles per coincidence, False to disable
@@ -117,8 +117,8 @@ if __name__ == "__main__":
     # cones_array = conesTTree2conesArray(fname / 'CC_Cones.root', E0_MeV, er, nSingles_max, true_coinc, nentries)
 
     # ###### READING Gate10 hit root files ##############
-    fname, E0_MeV, vpitch, source_pos = Path('../output'), 1.0, 200, [0, 0, -50]
-    cones_array = gHits2cones_byEvtID(fname / 'CC_Hits.root', E0_MeV)
+    # fname, E0_MeV, vpitch, source_pos = Path('../output'), 1.0, 200, [0, 0, -50]
+    # cones_array = gHits2cones_byEvtID(fname / 'CC_Hits.root', E0_MeV)
 
     # ###### Preprocessing #########
     # print('number of cones with a nan value:', cp.isnan(cones_array).any(axis=1).sum())
@@ -126,4 +126,4 @@ if __name__ == "__main__":
     # cones_array = remove_nans(cones_array)
     # print(len(cones_array), 'cones after removing nans')
 
-    valid_psource(cones_array, vpitch, source_pos)
+    # valid_psource(cones_array, vpitch, source_pos)
