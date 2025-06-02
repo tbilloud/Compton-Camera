@@ -30,3 +30,5 @@ Solutions:
 - rewrite ROOT file without prefix?
 - update detector_name_chars in DepositionReader and change detector name in geometry_conf_content?
   => I tried, looks like theres a problem with character `-` in `pixel_parm-0_0`. 
+
+# write gHits2cones (without byEvtID)

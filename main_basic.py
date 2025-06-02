@@ -1,10 +1,11 @@
 import opengate_core
 from opengate.managers import Simulation
-from opengate.geometry.volumes import *
+from opengate.utility import g4_units
 from tools.analysis_pixelHits import *
 from tools.analysis_pixelClusters import pixelHits2pixelClusters
 from tools.point_source_validation import *
 from tools.reco_backprojection import *
+from tools.utils_opengate import setup_pixels, theta_phi
 
 if __name__ == "__main__":
     sim, sim.output_dir = Simulation(), "output"
@@ -23,15 +24,7 @@ if __name__ == "__main__":
     sensor.material = "cadmium_telluride"
     sensor.size = [npix * pitch, npix * pitch, thickness]
     sensor.translation = [0 * um, 0 * um, 5 * mm]
-    if not sim.visu: # because 256 x 256 pixels are too heavy for visualization
-        pixel = sim.add_volume("Box", "pixel")
-        pixel.mother, pixel.size = sensor.name, [pitch, pitch, thickness]
-        pixel.material = sensor.material
-        par = RepeatParametrisedVolume(repeated_volume=pixel)
-        par.linear_repeat, par.translation = [npix, npix, 1], [pitch, pitch, 0]
-        sim.volume_manager.add_volume(par)
-    else:
-        global_log.warning("Simulation was ran without pixels, analysis will not work.")
+    setup_pixels(sim, npix, sensor, pitch, thickness)
 
     ## ===========================
     ## ==  PHYSICS              ==

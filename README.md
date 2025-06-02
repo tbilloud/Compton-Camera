@@ -35,7 +35,7 @@ Tested with:
 - GPU: 
   - cupy-cuda115/128 + GeForce RTX 2080 Ti
 
-Python3 install by default:
+Python3 installs by default:
 opengate==10.0.0 if 3.9, 3.10
 opengate==10.0.2 if 3.11
 
@@ -120,6 +120,33 @@ To use the GPU-based functions (point source validation, reconstruction):
 a) Install CUDA (https://developer.nvidia.com/cuda-downloads)
 b) Install the Cupy package suited to your CUDA version, e.g.  
 `pip install cupy-cuda115`
+
+## Installation without simulation packages
+
+Use cases:
+- For analyzing measured data, avoiding opengate and Allpix² saves time and disk space.
+- For visualizing with napari on MacOS, a 2nd virtual environment is needed (see QT/opengate conflict below).
+
+In opengate, running code without Monte Carlo (geant4) simulation is called 'offline'.
+
+If not already done, clone the repository:
+```
+git clone https://github.com/tbilloud/ComptonCamera
+cd ComptonCamera
+```
+
+Create a virtual environment without opengate and Allpix²:
+```
+python3 -m venv venv-offline
+source venv-offline/bin/activate
+pip install -r requirements-offline.txt
+```
+
+Try the offline example:
+```
+python3 main_offline.py
+```
+
 
 ## Getting started
 Run the tests:  

@@ -1,9 +1,6 @@
 # Functions to process pixelHits dataframes
 
 import os
-import sys
-import time
-
 import pandas
 import pandas as pd
 import uproot
@@ -13,7 +10,13 @@ import matplotlib.colors as mcolors
 from matplotlib.ticker import MaxNLocator
 
 from tools.utils import get_pixID
-from opengate.logger import global_log
+
+try:
+    from opengate.logger import global_log
+except ImportError:
+    import logging
+    global_log = logging.getLogger("dummy")
+    global_log.addHandler(logging.NullHandler())
 
 pandas.set_option('display.max_columns', 100)
 pandas.set_option('display.width', 400)
