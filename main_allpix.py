@@ -82,7 +82,6 @@ if __name__ == "__main__":
 
     # ################# PIXEL HITS ########################
     pixelHits = gHits2allpix2pixelHits(sim, npix, config='default', log_level='FATAL')
-    # TODO: check warning about (mobility?) model not adapted to CdTe
 
     # ################# PIXEL CLUSTERS ####################
     pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='m2')
