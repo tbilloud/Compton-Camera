@@ -23,13 +23,15 @@ pandas.set_option('display.width', 400)
 pandas.set_option('display.max_rows', 1000)
 pandas.set_option('display.float_format', lambda x: f'{x:.9}')  # G4 steps x:.3
 
+# Pixel hits format definition
+# Both PIXEL_ID and PIX_X_ID/PIX_Y_ID can be used or just one of them.
 PIXEL_ID = 'PixelID (int16)'
-TOA = 'ToA (ns)'
-ENERGY_keV = 'Energy (keV)'
 PIX_X_ID = 'X'  # pixel X index (starts from 0, bottom left)
 PIX_Y_ID = 'Y'  # pixel Y index (starts from 0, bottom left)
+TOA = 'ToA (ns)'
+ENERGY_keV = 'Energy (keV)'
 TOT = 'ToT'
-pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, TOT, ENERGY_keV, PIXEL_ID]
+pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, TOT, ENERGY_keV] # PIXEL_ID
 EVENTID = 'EventID'
 simulation_columns = [EVENTID]  # from Gate
 

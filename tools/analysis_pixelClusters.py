@@ -25,7 +25,7 @@ pixelClusters_columns = [PIX_X_ID, PIX_Y_ID, PIXEL_ID, TOA, ENERGY_keV]  # TODO 
 # TODO: if source.n was used in simulation, clustering with TOA does not work
 #  -> detect it ? send warning?
 
-def is_adjacent(hit, cluster, n_pix):
+def is_adjacent_1D(hit, cluster, n_pix):
     x1, y1 = get_pixID_2D(hit[PIXEL_ID], n_pix)
     return any(
         abs(x1 - x2) <= 1 and abs(y1 - y2) <= 1
@@ -33,6 +33,19 @@ def is_adjacent(hit, cluster, n_pix):
         (get_pixID_2D(hit[PIXEL_ID], n_pix) for _, hit in cluster.iterrows())
     )
 
+def is_adjacent_2D(hit, cluster, n_pix):
+    x1, y1 = hit[PIX_X_ID], hit[PIX_Y_ID]
+    return any(
+        abs(x1 - x2) <= 1 and abs(y1 - y2) <= 1
+        for _, h in cluster.iterrows()
+        for x2, y2 in [(h[PIX_X_ID], h[PIX_Y_ID])]
+    )
+
+def get_is_adjacent(pixelHits_columns):
+    if PIXEL_ID in pixelHits_columns:
+        return is_adjacent_1D
+    else:
+        return is_adjacent_2D
 
 def process_cluster_method1(cluster_df):
     cluster_total_energy = cluster_df[ENERGY_keV].sum()
@@ -53,7 +66,13 @@ def process_cluster_method2(cluster, n_pixels):
     cluster_total_energy = cluster[ENERGY_keV].sum()
     cluster_first_TOA = cluster[TOA].min()
     cluster_first_eventID = int(cluster[EVENTID].min())
-    pixX, pixY = zip(*cluster[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
+
+    if PIX_X_ID in cluster.columns and PIX_Y_ID in cluster.columns:
+        pixX = cluster[PIX_X_ID].to_numpy()
+        pixY = cluster[PIX_Y_ID].to_numpy()
+    else:
+        pixX, pixY = zip(*cluster[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
+
     x = sum(pixX * cluster[ENERGY_keV]) / cluster_total_energy
     y = sum(pixY * cluster[ENERGY_keV]) / cluster_total_energy
     return pd.DataFrame({
@@ -96,6 +115,8 @@ def pixelHits2pixelClusters(pixelHits, npix, window_ns, f, **kwargs):
     clust = pd.DataFrame([pixelHits.iloc[0]])  # Initialize with first hit
     wst = pixelHits.iloc[0][TOA] # window start
     clusters = []
+
+    is_adjacent = get_is_adjacent(pixelHits_columns)
 
     # Loop over hits
     for index, hit in pixelHits.iloc[1:].iterrows():
