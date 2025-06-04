@@ -8,8 +8,11 @@ import matplotlib.pyplot as plt
 from tools.utils import *
 import matplotlib.colors as mcolors
 from matplotlib.ticker import MaxNLocator
-
 from tools.utils import get_pixID
+import xml.etree.ElementTree as ET
+import base64
+import numpy as np
+
 
 try:
     from opengate.logger import global_log
@@ -31,7 +34,7 @@ PIX_Y_ID = 'Y'  # pixel Y index (starts from 0, bottom left)
 TOA = 'ToA (ns)'
 ENERGY_keV = 'Energy (keV)'
 TOT = 'ToT'
-pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, ENERGY_keV] # PIXEL_ID, TOT can be added
+pixelHits_columns = [PIXEL_ID, TOA, ENERGY_keV] # ADD / REMOVE columns as needed
 EVENTID = 'EventID'
 simulation_columns = [EVENTID]  # from Gate
 
@@ -242,4 +245,67 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
         global_log.error(f"Empty pixel hits dataframe, probably no hit produced.")
     global_log_debug_df(df)
     global_log.info(f"Offline [pixelHits]: {get_stop_string(stime)}")
+    return df
+
+
+def pixet2pixelHit(t3pa_file, xml_file, chipID):
+    df = pd.read_csv(t3pa_file, sep='\t', index_col='Index')
+
+    # ===========================
+    # ==  TIME CALIBRATION     ==
+    # ===========================
+
+    df['ToA (ns)'] = 25 * df['ToA'] - (25 / 16) * df['FToA']
+
+    # ===========================
+    # == ENERGY CALIBRATION    ==
+    # ===========================
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
+    chip = root.find(chipID)
+
+    calib_names = ['caliba', 'calibb', 'calibc', 'calibt']
+    calib_maps = {}
+
+    for name in calib_names:
+        calib_str = chip.find(name).text if chip is not None else None
+        if calib_str is not None:
+            decoded = base64.b64decode(calib_str)
+            arr = np.frombuffer(decoded, dtype=np.float32)
+            values = arr[1::2].reshape((256, 256))  # odd indices: values
+            calib_maps[name] = values
+
+    def matrix_index_to_xy(matrix_index, n_pixels=256):
+        y = matrix_index // n_pixels
+        x = matrix_index % n_pixels
+        return x, y
+
+    def tot_to_energy_analytical(tot, a, b, c, t):
+        # Quadratic coefficients
+        A = a
+        B = b - tot - a * t
+        C = -t * (b - tot) - c
+        discriminant = B ** 2 - 4 * A * C
+        if discriminant < 0 or A == 0:
+            return np.nan
+        E = (-B + np.sqrt(discriminant)) / (2 * A)
+        return E
+
+    def compute_energy_analytical(row):
+        x, y = matrix_index_to_xy(row['Matrix Index'])
+        x, y = int(x), int(y)
+        a = calib_maps['caliba'][y, x]
+        b = calib_maps['calibb'][y, x]
+        c = calib_maps['calibc'][y, x]
+        t = calib_maps['calibt'][y, x]
+        return tot_to_energy_analytical(row['ToT'], a, b, c, t)
+
+    df['Energy (keV)'] = df.apply(compute_energy_analytical, axis=1)
+
+    # ===========================
+    # ==  FORMAT DATAFRAME     ==
+    # ===========================
+    df = df.drop(columns=['ToA', 'ToT', 'FToA', 'Overflow'])
+    df = df.rename(columns={'Matrix Index': 'PixelID (int16)'})
+
     return df
