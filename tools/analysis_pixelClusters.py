@@ -22,9 +22,6 @@ pd.set_option('display.float_format',
 #  => fits Compton camera applications when detector position is used for reconstruction
 pixelClusters_columns = [PIX_X_ID, PIX_Y_ID, PIXEL_ID, TOA, ENERGY_keV]  # TODO not used
 
-# TODO: if source.n was used in simulation, clustering with TOA does not work
-#  -> detect it ? send warning?
-
 def is_adjacent_1D(hit, cluster, n_pix):
     x1, y1 = get_pixID_2D(hit[PIXEL_ID], n_pix)
     return any(
