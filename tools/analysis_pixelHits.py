@@ -275,23 +275,18 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
     chip = root.find(chipID)
 
     calib_names = ['caliba', 'calibb', 'calibc', 'calibt']
-    calib_maps = {}
+    calib = {}
 
     for name in calib_names:
         calib_str = chip.find(name).text if chip is not None else None
         if calib_str is not None:
             decoded = base64.b64decode(calib_str)
             arr = np.frombuffer(decoded, dtype=np.float32)
-            values = arr[1::2].reshape((256, 256))  # odd indices: values
-            calib_maps[name] = values
+            values = arr[1::2]
+            calib[name] = values
 
-    def matrix_index_to_xy(matrix_index, n_pixels=256):
-        y = matrix_index // n_pixels
-        x = matrix_index % n_pixels
-        return x, y
 
     def tot_to_energy_analytical(tot, a, b, c, t):
-        # Quadratic coefficients
         A = a
         B = b - tot - a * t
         C = -t * (b - tot) - c
@@ -302,12 +297,11 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
         return E
 
     def compute_energy_analytical(row):
-        x, y = matrix_index_to_xy(row['Matrix Index'])
-        x, y = int(x), int(y)
-        a = calib_maps['caliba'][y, x]
-        b = calib_maps['calibb'][y, x]
-        c = calib_maps['calibc'][y, x]
-        t = calib_maps['calibt'][y, x]
+        idx = int(row['Matrix Index'])
+        a = calib['caliba'][idx]
+        b = calib['calibb'][idx]
+        c = calib['calibc'][idx]
+        t = calib['calibt'][idx]
         return tot_to_energy_analytical(row['ToT'], a, b, c, t)
 
     df['Energy (keV)'] = df.apply(compute_energy_analytical, axis=1)
