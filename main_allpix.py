@@ -6,7 +6,7 @@ from tools.analysis_cones import gHits2cones_byEvtID, pixelClusters2cones_byEvtI
 from tools.analysis_pixelClusters import *
 from tools.point_source_validation import *
 from tools.allpix import *
-from tools.utils_opengate import setup_pixels
+from tools.utils_opengate import setup_pixels, set_fluorescence
 
 um, mm, keV, MeV, deg, Bq, sec = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.s
 
@@ -34,16 +34,8 @@ if __name__ == "__main__":
     ## ===========================
     ## ==  PHYSICS              ==
     ## ===========================
-    doppler = False
-    fluo = False
-    if doppler: sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics'
-    if fluo:
-        sim.physics_manager.global_production_cuts.gamma = 1 * um
-        sim.physics_manager.global_production_cuts.electron = 100 * um
-    sim.physics_manager.em_parameters.update(
-        {'fluo': fluo, 'pixe': fluo, 'deexcitation_ignore_cut': False,
-         'auger': fluo, 'auger_cascade': fluo})
-    # TODO: deexcitation_ignore_cut impacts number of hits, and depends on cuts
+    sim.physics_manager.physics_list_name = 'G4EmLivermorePhysics' # for Doppler effect
+    set_fluorescence(sim)
 
     ## =============================
     ## == ACTORS                  ==

@@ -32,6 +32,14 @@ def theta_phi(sensor, source):
     phi_deg = 180 - np.degrees(np.arctan(sensor_size / (2 * distance)))
     return [phi_deg * deg, 180 * deg], [0, 360 * deg]
 
+def set_fluorescence(sim):
+    sim.physics_manager.global_production_cuts.gamma = 1 * um
+    sim.physics_manager.global_production_cuts.electron = 100 * um
+    sim.physics_manager.em_parameters.update(
+        {'True': True, 'pixe': True, 'deexcitation_ignore_cut': False,
+         'auger': True, 'auger_cascade': True})
+    # TODO: deexcitation_ignore_cut impacts number of hits, and depends on cuts
+    
 def get_isotope_data(source):
     """
     Search and print Geant4 radioactive decay data for a given isotope
