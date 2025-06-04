@@ -1,3 +1,7 @@
+# Utility function when using opengate
+
+import os
+from pathlib import Path
 import numpy as np
 from opengate.logger import global_log
 from opengate.geometry.volumes import RepeatParametrisedVolume
@@ -27,3 +31,51 @@ def theta_phi(sensor, source):
         2] / 2
     phi_deg = 180 - np.degrees(np.arctan(sensor_size / (2 * distance)))
     return [phi_deg * deg, 180 * deg], [0, 360 * deg]
+
+def get_isotope_data(source):
+    """
+    Search and print Geant4 radioactive decay data for a given isotope
+
+    Args:
+        Z (int): Atomic number
+        A (int): Mass number
+    """
+    import os
+    from pathlib import Path
+
+    Z, A = source.ion['Z'], source.ion['A']
+    messages = []
+
+    g4_data = os.environ.get('G4RADIOACTIVEDATA')
+    if not g4_data:
+        messages.append("Warning: G4RADIOACTIVEDATA not set, try to initialize simulation first")
+        return "\n".join(messages)
+
+    radioactive_data_path = Path(g4_data)
+    isotope_file = f"z{Z}.a{A}"
+    possible_files = [
+        radioactive_data_path / f"{isotope_file}",
+        radioactive_data_path / f"{isotope_file}.z",
+        radioactive_data_path / f"{isotope_file}.txt"
+    ]
+
+    found_file = None
+    for file_path in possible_files:
+        if file_path.exists():
+            found_file = file_path
+            break
+
+    if found_file is None:
+        messages.append(f"No decay data found for Z={Z}, A={A}")
+        return "\n".join(messages)
+
+    messages.append(f"Found decay data in: {found_file}")
+
+    try:
+        with open(found_file, 'r') as f:
+            content = f.read()
+            messages.append(content)
+    except Exception as e:
+        messages.append(f"Error reading file: {e}")
+
+    return "\n".join(messages)
