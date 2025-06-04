@@ -248,8 +248,18 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
     return df
 
 
-def pixet2pixelHit(t3pa_file, xml_file, chipID):
-    df = pd.read_csv(t3pa_file, sep='\t', index_col='Index')
+def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
+    """
+    Convert pixel hits and calibration from ADVACAM/PIXET to a pixelHit DataFrame.
+
+    The measurement must be done with:
+    Measurement -> Type -> Pixels
+    Detector Setting -> Mode -> ToA + ToT
+    => This stores a .t3pa and a .t3pa.info file. Only the .t3pa file is needed here.
+
+    The XML file and chip ID should be provided when purchasing a detector.
+    """
+    df = pd.read_csv(t3pa_file, sep='\t', index_col='Index', nrows=max_rows)
 
     # ===========================
     # ==  TIME CALIBRATION     ==
