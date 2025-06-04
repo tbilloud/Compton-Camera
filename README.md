@@ -39,7 +39,7 @@ Python3 installs by default:
 opengate==10.0.0 if 3.9, 3.10
 opengate==10.0.2 if 3.11
 
-## Installation
+## [Installation](#install)
 
 If not already installed, install a suitable python version and pip.
 MacOS: use pyenv for example
@@ -112,8 +112,10 @@ If using PyCharm:
 
 If environment is not set properly, you might get errors like:  
 `ImportError: .../libG4geometry-cf4c216c.so: cannot allocate memory in static TLS block`
-`QObject::moveToThread: Current thread (0x5dfc4786c040) is not the object's thread...`
 `ERROR: ld.so: object ... from LD_PRELOAD cannot be preloaded (...): ignored.'`
+
+`QObject::moveToThread: Current thread (0x5dfc4786c040) is not the object's thread...`  
+=> for this error see section [QT/opengate conflict](#qtopengate-conflict) below.
 
 ### 6) Optional: Install GPU tools
 To use the GPU-based functions (point source validation, reconstruction):
@@ -121,7 +123,7 @@ a) Install CUDA (https://developer.nvidia.com/cuda-downloads)
 b) Install the Cupy package suited to your CUDA version, e.g.  
 `pip install cupy-cuda115`
 
-## Installation without simulation packages
+## [Installation without simulation packages](#install-offline)
 
 Use cases:
 - For analyzing measured data, avoiding opengate and Allpix² saves time and disk space.
@@ -148,7 +150,7 @@ python3 main_offline.py
 ```
 
 
-## Getting started
+## [Getting started](#getting-started)
 Run the tests:  
 ```
 python3 main_basic.py
@@ -181,30 +183,8 @@ For Linux users, potting functions using napari are available:
 - show reconstructed source and detector geometry in 3D with plot_reconstruction_napari()
 Does not work on MacOS yet, see QT/opengate conflict below.
 
-### QT/opengate conflict:
-Napari and OpenGate use the same QT backends (PyQt5), which causes conflicts.
-Using Qt-based code (e.g. napari) and gate in the same script leads to warning/crashes.  
-#### Ubuntu
-```
-WARNING: QObject::moveToThread: Current thread (0x57ad941535d0) is not the object's thread (0x57ad94c1ef50).
-Cannot move to target thread (0x57ad941535d0)
-```
-Solution:
-```
-mv /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins.bak
-```
--> replace XX with your python version, e.g. 10
 
-#### Macos
-```
-objc[16117]: Class QT_... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d1278) ... One of the duplicates must be removed or renamed.
-objc[16117]: Class KeyV... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d12a0) ... One of the duplicates must be removed or renamed.
-objc[16117]: Class RunL... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d12f0) ... One of the duplicates must be removed or renamed.
-```
-Solution: TODO !
-
-
-## Allpix²
+## [Allpix²](#allpix2)
 
 Allpix² is a C++ software for precise simulation of semiconductor pixel detectors.
 It simulates the transport of charge carriers in semiconductor sensors and their signal induction.
@@ -249,3 +229,24 @@ For each component, several modules are available.
   - CSADigitizer
 
 
+## [QT/opengate conflict](#qt)
+Napari and OpenGate use the same QT backends (PyQt5), which causes conflicts.
+Using Qt-based code (e.g. napari) and gate in the same script leads to warning/crashes.  
+### Ubuntu
+```
+WARNING: QObject::moveToThread: Current thread (0x57ad941535d0) is not the object's thread (0x57ad94c1ef50).
+Cannot move to target thread (0x57ad941535d0)
+```
+Solution:
+```
+mv /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins /path-to-virtual-environment/lib/python3.XX/site-packages/opengate_core/plugins.bak
+```
+-> replace XX with your python version, e.g. 10
+
+### Macos
+```
+objc[16117]: Class QT_... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d1278) ... One of the duplicates must be removed or renamed.
+objc[16117]: Class KeyV... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d12a0) ... One of the duplicates must be removed or renamed.
+objc[16117]: Class RunL... is implemented in both .../opengate_core/.dylibs/QtCore and .../QtCore (0x16c7d12f0) ... One of the duplicates must be removed or renamed.
+```
+Solution: TODO !
