@@ -7,8 +7,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import logging
 
-from tools.analysis_pixelHits import pixet2pixelHit
-
 try:
     from opengate.logger import global_log
     global_log.setLevel(logging.DEBUG)
@@ -29,27 +27,34 @@ plt.title('Pixel Hits SIMULATED')
 plt.show()
 
 # MEASUREMENT
+from tools.analysis_pixelHits import pixet2pixelHit
 file_t3pa = '/home/billoud/DATA/data-driven/Lu177_300s.t3pa'
 file_xml = '/home/billoud/workspace/MISC/MINIPIX/Calibration/MiniPIX-H06-W0130.xml'
-pixelHits_meas = pixet2pixelHit(file_t3pa, file_xml, 'H06-W0130', max_rows=1000)
+pixelHits_meas = pixet2pixelHit(file_t3pa, file_xml, 'H06-W0130', max_rows=10000)
 plt.hist(pixelHits_meas['Energy (keV)'], bins=240, range=(10, 250))
 plt.xlabel('Energy (keV)')
 plt.ylabel('Count')
 plt.title('Pixel Hits MEASURED')
 plt.show()
 
-sys.exit()
-
 # ===========================
 # ==   PIXEL CLUSTERS      ==
 # ===========================
 from tools.analysis_pixelClusters import pixelHits2pixelClusters
-pixelClusters = pixelHits2pixelClusters(pixelHits, npix=256, window_ns=100, f='m2')
+pixelClusters = pixelHits2pixelClusters(pixelHits, npix=256, window_ns=100, f='meas')
 plt.hist(pixelClusters['Energy (keV)'], bins=240, range=(10, 250))
 plt.xlabel('Energy (keV)')
 plt.ylabel('Count')
-plt.title('Pixel Clusters')
+plt.title('Pixel Clusters SIMULATED')
 plt.show()
+
+pixelClusters_meas = pixelHits2pixelClusters(pixelHits_meas, npix=256, window_ns=100, f='meas')
+plt.hist(pixelClusters_meas['Energy (keV)'], bins=240, range=(10, 250))
+plt.xlabel('Energy (keV)')
+plt.ylabel('Count')
+plt.title('Pixel Clusters MEASURED')
+plt.show()
+
 
 sys.exit()
 
