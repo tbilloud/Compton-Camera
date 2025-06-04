@@ -31,7 +31,7 @@ PIX_Y_ID = 'Y'  # pixel Y index (starts from 0, bottom left)
 TOA = 'ToA (ns)'
 ENERGY_keV = 'Energy (keV)'
 TOT = 'ToT'
-pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, TOT, ENERGY_keV] # PIXEL_ID
+pixelHits_columns = [PIX_X_ID, PIX_Y_ID, TOA, ENERGY_keV] # PIXEL_ID, TOT can be added
 EVENTID = 'EventID'
 simulation_columns = [EVENTID]  # from Gate
 
