@@ -1,9 +1,15 @@
 # Functions to process pixelClusters dataframes
 
 from tools.analysis_pixelHits import *
-from opengate.logger import global_log
-from .analysis_pixelHits import PIXEL_ID, TOA, ENERGY_keV, EVENTID
 import pandas as pd
+
+try:
+    from opengate.logger import global_log
+except ImportError:
+    import logging
+    global_log = logging.getLogger("dummy")
+    global_log.addHandler(logging.NullHandler())
+    print('not ok')
 
 pd.set_option('display.max_columns', 100)
 pd.set_option('display.width', 400)
