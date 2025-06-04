@@ -110,7 +110,7 @@ bump_height = 20.0um
         "precise": f""" 
     [ElectricFieldReader]
     model="constant"
-    bias_voltage=-1000V
+    bias_voltage=-500V
     [WeightingPotentialReader]
     model = "mesh"
     file_name = "{wp_fname if config=='precise' else ''}_weightingpotential.apf"
@@ -121,12 +121,12 @@ bump_height = 20.0um
     mobility_hole = 500cm*cm/V/s # holes always propagated
     integration_time = 1us  # default 25ns might stop propagation
     timestep = 0.1ns
-    distance = 0
+    distance = 0 # 0 means no transient signal on neighboring pixels
     [PulseTransfer]
     [DefaultDigitizer]
-    threshold = 1e # 0e turns off ToA... 
-    threshold_smearing = 0e
-    electronics_noise = 0e
+    threshold = 1000e # 0e turns off ToA... 
+    # threshold_smearing = 0e
+    # electronics_noise = 0e
     """
     }
 
