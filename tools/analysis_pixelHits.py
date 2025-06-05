@@ -285,7 +285,7 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
     calib = {}
 
     for name in calib_names:
-        calib_str = chip.find(name).text if chip
+        calib_str = chip.find(name).text
         if calib_str is not None:
             decoded = base64.b64decode(calib_str)
             arr = np.frombuffer(decoded, dtype=np.float32)
