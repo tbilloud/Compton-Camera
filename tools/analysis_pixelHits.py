@@ -261,6 +261,10 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
     """
     df = pd.read_csv(t3pa_file, sep='\t', index_col='Index', nrows=max_rows)
 
+    global_log.info(f"Offline [pixelHits]: START")
+    global_log.debug(f"Input {t3pa_file,xml_file}")
+    stime = time.time()
+
     # ===========================
     # ==  TIME CALIBRATION     ==
     # ===========================
@@ -273,12 +277,15 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
     tree = ET.parse(xml_file)
     root = tree.getroot()
     chip = root.find(chipID)
+    if not chip:
+        global_log.error(f"Chip {chipID} not found in XML file {xml_file}")
+        sys.exit(1)
 
     calib_names = ['caliba', 'calibb', 'calibc', 'calibt']
     calib = {}
 
     for name in calib_names:
-        calib_str = chip.find(name).text if chip is not None else None
+        calib_str = chip.find(name).text if chip
         if calib_str is not None:
             decoded = base64.b64decode(calib_str)
             arr = np.frombuffer(decoded, dtype=np.float32)
@@ -312,4 +319,8 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
     df = df.drop(columns=['ToA', 'ToT', 'FToA', 'Overflow'])
     df = df.rename(columns={'Matrix Index': 'PixelID (int16)'})
 
+    if len(df) == 0:
+        global_log.error(f"Empty pixel hits dataframe, probably no hit produced.")
+    global_log_debug_df(df)
+    global_log.info(f"Offline [pixelHits]: {get_stop_string(stime)}")
     return df
