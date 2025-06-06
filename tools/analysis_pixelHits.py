@@ -281,7 +281,7 @@ def pixet2pixelHit(t3pa_file, calib, chipID=None, max_rows=None):
     # ===========================
 
     calib_names = ['caliba', 'calibb', 'calibc', 'calibt']
-    calib = {}
+    calib_dict = {}
 
     if calib.endswith('xml'):
         global_log.info(f"Offline [pixelHits]: Using XML file for calibration")
@@ -290,7 +290,7 @@ def pixet2pixelHit(t3pa_file, calib, chipID=None, max_rows=None):
         root = tree.getroot()
         chip = root.find(chipID)
         if not chip:
-            global_log.error(f"Chip {chipID} not found in XML file {calib}")
+            global_log.error(f"Chip {chipID} not found in XML file {calib_dict}")
             sys.exit(1)
         for name in calib_names:
             calib_str = chip.find(name).text
@@ -298,7 +298,7 @@ def pixet2pixelHit(t3pa_file, calib, chipID=None, max_rows=None):
                 decoded = base64.b64decode(calib_str)
                 arr = np.frombuffer(decoded, dtype=np.float32)
                 values = arr[1::2]
-                calib[name] = values
+                calib_dict[name] = values
     elif os.path.isdir(calib):
         global_log.info(f"Offline [pixelHits]: Searching {calib} for calib files")
         for name in calib_names:
@@ -306,7 +306,7 @@ def pixet2pixelHit(t3pa_file, calib, chipID=None, max_rows=None):
             arr = np.loadtxt(file_path)
             if arr.shape != (256, 256):
                 raise ValueError(f"{file_path} does not have shape (256, 256)")
-            calib[name] = arr.flatten()  # row-major order
+            calib_dict[name] = arr.flatten()  # row-major order
 
     def tot_to_energy(tot, a, b, c, t):
         A = a
@@ -319,14 +319,14 @@ def pixet2pixelHit(t3pa_file, calib, chipID=None, max_rows=None):
         return E
 
     for name in calib_names:
-        global_log.debug(f"Mean of {name}: {np.mean(calib[name])}")
+        global_log.debug(f"Mean of {name}: {np.mean(calib_dict[name])}")
 
     def compute_energy(row):
         idx = int(row['Matrix Index'])
-        a = calib['caliba'][idx]
-        b = calib['calibb'][idx]
-        c = calib['calibc'][idx]
-        t = calib['calibt'][idx]
+        a = calib_dict['caliba'][idx]
+        b = calib_dict['calibb'][idx]
+        c = calib_dict['calibc'][idx]
+        t = calib_dict['calibt'][idx]
         return tot_to_energy(row['ToT'], a, b, c, t)
 
     df['Energy (keV)'] = df.apply(compute_energy, axis=1)
