@@ -86,7 +86,7 @@ def process_cluster_method2(cluster, n_pixels):
         TOA: [cluster_first_TOA]
     })
 
-def process_cluster_method3(cluster, n_pixels):
+def process_cluster_meas_calibrated(cluster, n_pixels):
     """
     X and Y are in the sensor's local coordinates system, as in Allpix2
     => origin = center of the lower-left pixel
@@ -104,10 +104,29 @@ def process_cluster_method3(cluster, n_pixels):
         TOA: [cluster_first_TOA]
     })
 
+def process_cluster_meas_tot(cluster, n_pixels):
+    """
+    X and Y are in the sensor's local coordinates system, as in Allpix2
+    => origin = center of the lower-left pixel
+    """
+    cluster_total_energy = cluster[TOT].sum()
+    cluster_first_TOA = cluster[TOA].min()
+
+    pixX, pixY = zip(*cluster[PIXEL_ID].apply(get_pixID_2D, args=(n_pixels,)))
+    x = sum(pixX * cluster[TOT]) / cluster_total_energy
+    y = sum(pixY * cluster[TOT]) / cluster_total_energy
+    return pd.DataFrame({
+        PIX_X_ID: [x],
+        PIX_Y_ID: [y],
+        TOT: [cluster_total_energy],
+        TOA: [cluster_first_TOA]
+    })
+
 process_cluster_functions = {
     'm1': process_cluster_method1,
     'm2': process_cluster_method2,
-    'meas': process_cluster_method3
+    'meas_calib': process_cluster_meas_calibrated,
+    'meas_tot': process_cluster_meas_tot
 }
 
 
