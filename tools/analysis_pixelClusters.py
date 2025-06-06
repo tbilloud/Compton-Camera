@@ -61,7 +61,7 @@ def process_cluster_method1(cluster_df):
     })
 
 
-def process_cluster_method2(cluster, n_pixels):
+def process_cluster_simu_calib(cluster, n_pixels):
     """
     X and Y are in the sensor's local coordinates system, as in Allpix2
     => origin = center of the lower-left pixel
@@ -124,7 +124,7 @@ def process_cluster_meas_tot(cluster, n_pixels):
 
 process_cluster_functions = {
     'm1': process_cluster_method1,
-    'm2': process_cluster_method2,
+    'simu_calib': process_cluster_simu_calib,
     'meas_calib': process_cluster_meas_calibrated,
     'meas_tot': process_cluster_meas_tot
 }
