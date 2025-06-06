@@ -2,7 +2,7 @@ import subprocess
 from scipy.spatial.transform import Rotation as R
 import warnings
 from tools.analysis_pixelHits import *
-
+import opengate
 
 def run_allpix(sim,
                binary_path='allpix/allpix-squared/install-noG4/bin/',
@@ -52,10 +52,11 @@ def run_allpix(sim,
     # ==========================
     # == PRODUCE CONFIG FILES ==
     # ==========================
+    sensor_translation = opengate.geometry.utility.get_transform_world_to_local(sensor)[0][0]
 
     geometry_conf_content = f"""[0_0]
 type = "detector_model"
-position = {" ".join([f"{sensor.translation[i]}mm" for i in range(3)])}
+position = {" ".join([f"{sensor_translation[i]}mm" for i in range(3)])}
 orientation = {" ".join([f"{angles[i]}deg" for i in range(3)])}
     """
 
