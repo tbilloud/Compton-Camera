@@ -27,10 +27,30 @@ if __name__ == "__main__":
     # ===========================
     npix, pitch, thickness = 256, 55 * um, 1 * mm
     sim.world.material = "Air"
+
+    al = 1 * mm  # Aluminum layer thickness
+    gap = 10 * mm  # Air gap thickness
+    assembly = sim.add_volume("Box", "assembly")
+    assembly.size = [npix * pitch, npix * pitch, thickness + al + gap]
+    assembly.material = "Air"
+    assembly.translation = [0 * mm, 0 * mm, 10 * mm]
+    al_layer = sim.add_volume("Box", "al_layer")
+    al_layer.mother = assembly
+    al_layer.material = "Aluminium"
+    al_layer.size = [npix * pitch, npix * pitch, al]
+    al_layer.translation = [0 * mm, 0 * mm, - (thickness + al + gap) / 2 + al / 2]
     sensor = sim.add_volume("Box", "sensor")
+    sensor.mother = assembly # remove if sensor is alone
     sensor.material = "cadmium_telluride" # or 'Silicon'
     sensor.size = [npix * pitch, npix * pitch, thickness]
-    sensor.translation = [0 * mm, 0 * mm, 10 * mm]
+    sensor.translation = [0 * mm, 0 * mm, (thickness + al + gap) / 2 - thickness / 2]
+    sensor.color = [1.0, 0.0, 0.0, 1.0]  # RGBA: red, fully opaque
+
+    # sensor = sim.add_volume("Box", "sensor")
+    # sensor.material = "cadmium_telluride" # or 'Silicon'
+    # sensor.size = [npix * pitch, npix * pitch, thickness]
+    # sensor.translation = [0 * mm, 0 * mm, 10 * mm]
+
     setup_pixels(sim, npix, sensor, pitch, thickness)
 
     ## ===========================
@@ -58,10 +78,9 @@ if __name__ == "__main__":
     ## == SOURCE                 ==
     ## ============================
     source = sim.add_source("GenericSource", "source")
-    source.activity, sim.run_timing_intervals = 250 * kBq, [[0, 10 * ms]] # TODO: file size wrong above 100ms
+    source.activity, sim.run_timing_intervals = 250 * kBq, [[0, 100 * ms]] # TODO: file size wrong above 100ms
     source.particle, source.half_life = 'ion 71 177', 6.65 * day # Lu177
     global_log.debug(get_isotope_data(source))
-    source.direction.theta, source.direction.phi = theta_phi(sensor, source)
     sim.world.size = get_worldSize(sensor, source, margin=10)
 
     ## ============================
@@ -77,9 +96,9 @@ if __name__ == "__main__":
     singles_path = Path(sim.output_dir) / singles.output_filename
 
     # ################# PIXEL HITS ########################
-    #pixelHits = gHits2allpix2pixelHits(sim, npix, config='precise', log_level='FATAL')
-    #pixelHits.to_csv(f'output/pixelHits_{int(source.activity/kBq)}kBq_{int(sim.run_timing_intervals[0][1]/ms)}ms.csv', index=False)
-    pixelHits = singles2pixelHits(singles_path)
+    pixelHits = gHits2allpix2pixelHits(sim, npix, config='precise', log_level='FATAL')
+    pixelHits.to_csv(f'output/pixelHits_{int(source.activity/kBq)}kBq_{int(sim.run_timing_intervals[0][1]/ms)}ms.csv', index=False)
+    # pixelHits = singles2pixelHits(singles_path)
 
     # ################# PIXEL CLUSTERS ####################
     pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='m2')
