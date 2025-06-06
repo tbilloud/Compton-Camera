@@ -1,6 +1,8 @@
+from pathlib import Path
 import opengate_core
 from opengate.managers import Simulation
 from opengate.utility import g4_units
+from tools.analysis_cones import gHits2cones_byEvtID, pixelClusters2cones_byEvtID
 from tools.analysis_pixelHits import *
 from tools.analysis_pixelClusters import pixelHits2pixelClusters
 from tools.point_source_validation import *
