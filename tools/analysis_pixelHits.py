@@ -248,21 +248,26 @@ def allpixTxt2pixelHit(text_file, n_pixels=256):
     return df
 
 
-def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
+def pixet2pixelHit(t3pa_file, calib, chipID=None, max_rows=None):
     """
     Convert pixel hits and calibration from ADVACAM/PIXET to a pixelHit DataFrame.
 
+    calib can be:
+    * A directory containing the files caliba.txt, calibb.txt, calibc.txt, calibt.txt
+      => In Pixet: Detector Setting -> More Detector Settings -> Chips -> Save
+    * An XML file containing the calibration data for the chipID
+
     The measurement must be done with:
-    Measurement -> Type -> Pixels
-    Detector Setting -> Mode -> ToA + ToT
+    * Measurement -> Type -> Pixels
+    * Detector Setting -> Mode -> ToA + ToT
     => This stores a .t3pa and a .t3pa.info file. Only the .t3pa file is needed here.
 
-    The XML file and chip ID should be provided when purchasing a detector.
+    The XML file and chip ID are provided when purchasing a detector.
     """
     df = pd.read_csv(t3pa_file, sep='\t', index_col='Index', nrows=max_rows)
 
     global_log.info(f"Offline [pixelHits]: START")
-    global_log.debug(f"Input {t3pa_file,xml_file}")
+    global_log.debug(f"Inputs:\n{t3pa_file}\n{calib}")
     stime = time.time()
 
     # ===========================
@@ -274,26 +279,36 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
     # ===========================
     # == ENERGY CALIBRATION    ==
     # ===========================
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-    chip = root.find(chipID)
-    if not chip:
-        global_log.error(f"Chip {chipID} not found in XML file {xml_file}")
-        sys.exit(1)
 
     calib_names = ['caliba', 'calibb', 'calibc', 'calibt']
     calib = {}
 
-    for name in calib_names:
-        calib_str = chip.find(name).text
-        if calib_str is not None:
-            decoded = base64.b64decode(calib_str)
-            arr = np.frombuffer(decoded, dtype=np.float32)
-            values = arr[1::2]
-            calib[name] = values
+    if calib.endswith('xml'):
+        global_log.info(f"Offline [pixelHits]: Using XML file for calibration")
+        global_log.error("Reading calibration from XML seems wrong with current decoding")
+        tree = ET.parse(calib)
+        root = tree.getroot()
+        chip = root.find(chipID)
+        if not chip:
+            global_log.error(f"Chip {chipID} not found in XML file {calib}")
+            sys.exit(1)
+        for name in calib_names:
+            calib_str = chip.find(name).text
+            if calib_str is not None:
+                decoded = base64.b64decode(calib_str)
+                arr = np.frombuffer(decoded, dtype=np.float32)
+                values = arr[1::2]
+                calib[name] = values
+    elif os.path.isdir(calib):
+        global_log.info(f"Offline [pixelHits]: Searching {calib} for calib files")
+        for name in calib_names:
+            file_path = os.path.join(calib, f"{name}.txt")
+            arr = np.loadtxt(file_path)
+            if arr.shape != (256, 256):
+                raise ValueError(f"{file_path} does not have shape (256, 256)")
+            calib[name] = arr.flatten()  # row-major order
 
-
-    def tot_to_energy_analytical(tot, a, b, c, t):
+    def tot_to_energy(tot, a, b, c, t):
         A = a
         B = b - tot - a * t
         C = -t * (b - tot) - c
@@ -303,15 +318,18 @@ def pixet2pixelHit(t3pa_file, xml_file, chipID, max_rows=None):
         E = (-B + np.sqrt(discriminant)) / (2 * A)
         return E
 
-    def compute_energy_analytical(row):
+    for name in calib_names:
+        global_log.debug(f"Mean of {name}: {np.mean(calib[name])}")
+
+    def compute_energy(row):
         idx = int(row['Matrix Index'])
         a = calib['caliba'][idx]
         b = calib['calibb'][idx]
         c = calib['calibc'][idx]
         t = calib['calibt'][idx]
-        return tot_to_energy_analytical(row['ToT'], a, b, c, t)
+        return tot_to_energy(row['ToT'], a, b, c, t)
 
-    df['Energy (keV)'] = df.apply(compute_energy_analytical, axis=1)
+    df['Energy (keV)'] = df.apply(compute_energy, axis=1)
 
     # ===========================
     # ==  FORMAT DATAFRAME     ==

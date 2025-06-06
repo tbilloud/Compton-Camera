@@ -19,42 +19,30 @@ except ImportError:
 # ===========================
 
 # SIMULATION
-pixelHits = pd.read_csv('output/pixelHits_250kBq_10ms.csv')
-plt.hist(pixelHits['Energy (keV)'], bins=240, range=(10, 250))
-plt.xlabel('Energy (keV)')
-plt.ylabel('Count')
-plt.title('Pixel Hits SIMULATED')
-plt.show()
+pixelHits = pd.read_csv('output/pixelHits_250kBq_100ms.csv')
 
 # MEASUREMENT
 from tools.analysis_pixelHits import pixet2pixelHit
 file_t3pa = '/home/billoud/DATA/data-driven/Lu177_300s.t3pa'
-file_xml = '/home/billoud/workspace/MISC/MINIPIX/Calibration/MiniPIX-H06-W0130.xml'
-pixelHits_meas = pixet2pixelHit(file_t3pa, file_xml, 'H06-W0130', max_rows=10000)
-plt.hist(pixelHits_meas['Energy (keV)'], bins=240, range=(10, 250))
-plt.xlabel('Energy (keV)')
-plt.ylabel('Count')
-plt.title('Pixel Hits MEASURED')
-plt.show()
+pixelHits_meas = pixet2pixelHit(file_t3pa, calib='./minipix/', max_rows=10000)
 
 # ===========================
 # ==   PIXEL CLUSTERS      ==
 # ===========================
 from tools.analysis_pixelClusters import pixelHits2pixelClusters
-pixelClusters = pixelHits2pixelClusters(pixelHits, npix=256, window_ns=100, f='meas')
-plt.hist(pixelClusters['Energy (keV)'], bins=240, range=(10, 250))
-plt.xlabel('Energy (keV)')
-plt.ylabel('Count')
-plt.title('Pixel Clusters SIMULATED')
+
+# SIMULATION
+pixelClusters = pixelHits2pixelClusters(pixelHits, npix=256, window_ns=100, f='meas_calib')
+plt.hist(pixelClusters['Energy (keV)'], bins=300, range=(0, 300))
+plt.xlabel('Energy (keV)'),plt.ylabel('Count'),plt.title('Single Clusters SIMULATED')
 plt.show()
 
-pixelClusters_meas = pixelHits2pixelClusters(pixelHits_meas, npix=256, window_ns=100, f='meas')
-plt.hist(pixelClusters_meas['Energy (keV)'], bins=240, range=(10, 250))
-plt.xlabel('Energy (keV)')
-plt.ylabel('Count')
-plt.title('Pixel Clusters MEASURED')
+# MEASUREMENT
+# print(pixelHits_meas)
+pixelClusters_meas = pixelHits2pixelClusters(pixelHits_meas, npix=256, window_ns=100, f='meas_calib')
+plt.hist(pixelClusters_meas['Energy (keV)'], bins=300, range=(0, 300))
+plt.xlabel('Energy (keV)'),plt.ylabel('Count'),plt.title('Single Clusters MEASURED')
 plt.show()
-
 
 sys.exit()
 
