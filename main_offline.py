@@ -6,6 +6,7 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import logging
+from tools.utils_plot import plot_hitsNclusters
 
 try:
     from opengate.logger import global_log
@@ -33,17 +34,11 @@ from tools.analysis_pixelClusters import pixelHits2pixelClusters
 
 # SIMULATION
 pixelClusters = pixelHits2pixelClusters(pixelHits, npix=256, window_ns=100, f='meas_calib')
-plt.hist(pixelClusters['Energy (keV)'], bins=300, range=(0, 300))
-plt.xlabel('Energy (keV)'),plt.ylabel('Count'),plt.title('Single Clusters SIMULATED')
-plt.show()
 
 # MEASUREMENT
-# print(pixelHits_meas)
 pixelClusters_meas = pixelHits2pixelClusters(pixelHits_meas, npix=256, window_ns=100, f='meas_calib')
-plt.hist(pixelClusters_meas['Energy (keV)'], bins=300, range=(0, 300))
-plt.xlabel('Energy (keV)'),plt.ylabel('Count'),plt.title('Single Clusters MEASURED')
-plt.show()
 
+plot_hitsNclusters(pixelHits_meas, pixelClusters_meas, max_keV=300)
 sys.exit()
 
 # ===========================
