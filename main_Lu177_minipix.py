@@ -101,6 +101,6 @@ if __name__ == "__main__":
     # pixelHits = singles2pixelHits(singles_path)
 
     # ################# PIXEL CLUSTERS ####################
-    pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='m2')
+    pixelClusters = pixelHits2pixelClusters(pixelHits, npix=npix, window_ns=100, f='meas_calib')
 
     plot_hitsNclusters(pixelHits, pixelClusters, max_keV=300)
