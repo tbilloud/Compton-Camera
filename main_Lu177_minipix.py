@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     # ################# PIXEL HITS ########################
     pixelHits = gHits2allpix2pixelHits(sim, npix, config='precise', log_level='FATAL')
-    pixelHits.to_csv(f'output/pixelHits_{int(source.activity/kBq)}kBq_{int(sim.run_timing_intervals[0][1]/ms)}ms.csv', index=False)
+    pixelHits.to_csv(f'output/pixelHits_{source.particle}_{int(source.activity/kBq)}kBq_{int(sim.run_timing_intervals[0][1]/ms)}ms.csv', index=False)
     # pixelHits = singles2pixelHits(singles_path)
 
     # ################# PIXEL CLUSTERS ####################
