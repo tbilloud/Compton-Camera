@@ -18,7 +18,7 @@ if __name__ == "__main__":
     um, mm, keV, MeV, deg, Bq, ms, sec, min, hour, day, year = g4_units.um, g4_units.mm, g4_units.keV, g4_units.MeV, g4_units.deg, g4_units.Bq, g4_units.ms, g4_units.s, g4_units.min, g4_units.hour, g4_units.day, g4_units.year
     kBq, MBq = 1_000 * Bq, 1_000_000 * Bq
     sim.volume_manager.add_material_database('tools/GateMaterials.db')
-    sim.random_engine, sim.random_seed = "MersenneTwister", 1
+    # sim.random_engine, sim.random_seed = "MersenneTwister", 1
     sim.visu = False
     sim.verbose_level = 'DEBUG' # DEBUG for data preview, INFO for algo timing only
 
